@@ -9,7 +9,8 @@ type: page
 * content
 {:toc}
 
-Github account: [largecats](https://github.com/largecats)
+[Github](https://github.com/largecats)
+[LinkedIn](https://www.linkedin.com/in/linfan-xiao/)
 
 
 <!-- ## Comments -->
