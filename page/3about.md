@@ -9,10 +9,9 @@ type: page
 * content
 {:toc}
 
-## About me
+Github account: [largecats](https://github.com/largecats)
 
 
-
-## Comments
+<!-- ## Comments -->
 
 {% include comments.html %}
