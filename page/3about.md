@@ -9,12 +9,14 @@ type: page
 * content
 {:toc}
 
+### About me
+
 Movie and movie soundtracks lover. Occasionally math/cs/statistics student.
 
 [Github](https://github.com/largecats)
 
 [LinkedIn](https://www.linkedin.com/in/linfan-xiao/)
 
-<!-- ## Comments -->
+### About this site
 
-{% include comments.html %}
+Jekyll theme by [Gaohaoyang](https://github.com/Gaohaoyang).
