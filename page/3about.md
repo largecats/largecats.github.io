@@ -11,7 +11,7 @@ type: page
 
 ### About me
 
-Movie and movie soundtracks lover. Occasionally math/cs/statistics student.
+Movie and movie soundtracks lover. Occasionally student of math/cs/stats.
 
 [Github](https://github.com/largecats)
 
