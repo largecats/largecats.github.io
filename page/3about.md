@@ -11,9 +11,9 @@ type: page
 
 ### About me
 
-Movie and movie soundtracks lover. Occasionally student of math/cs/stats.
+Lover of movie, movie soundtracks, comics, and anything fictional. Occasionally student of mathematics, computer science, and statistics.
 
-[Github](https://github.com/largecats)
+[GitHub](https://github.com/largecats)
 
 [LinkedIn](https://www.linkedin.com/in/linfan-xiao/)
 
