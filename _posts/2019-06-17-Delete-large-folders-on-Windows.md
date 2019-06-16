@@ -10,12 +10,12 @@ tags: windows dos
 {:toc}
 
 ## Motivation
-
 At times we may want to delete huge folders, e.g., when doing backups. Deleting large folders in Windows explorer could take quite a while because Windows would first calculate the folder's size, which is time-consuming. Therefore, it would be great to know how to quickly delete huge folders on Windows.
 
-## Method
 
-Suppose the folder to be deleted is called `foldername`.
+
+## Method
+Suppose the large folder to be deleted is called `foldername`.
 
 1. Open cmd.
 2. Type `cd C:\backup\foldername` to navigate to the folder to be deleted.

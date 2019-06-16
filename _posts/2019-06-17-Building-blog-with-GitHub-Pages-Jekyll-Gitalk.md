@@ -10,11 +10,11 @@ tags: github-pages jekyll gitalk windows
 {:toc}
 
 ## Motivation
-
 TBD
 
-## Method
 
+
+## Method
 TBD
 
 **Register a GitHub account**
@@ -38,11 +38,3 @@ TBD
 **Launch blog locally**
 
 **Push to GitHub**
-
-a
-
-
-d
-
-
-e
