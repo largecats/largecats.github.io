@@ -14,7 +14,7 @@ I wanted to set up a technical blog free of charge. A quick search on the world 
 
 
 
-This blog is essentially a GitHub repository, where some of the repository's features are transformed via GitHub Pages, Jekyll, and Gitalk to become features of a blog site. [GitHub Pages](https://pages.github.com/) is a static site hosting service that can host webpages from a GitHub repository. [Jekyll](https://jekyllrb.com/) is a static site generator that, when used with GitHub Pages, serves to update all the pages on the blog every time a commit to the associated repository is made. [Gitalk](https://github.com/gitalk/gitalk) is a comment plugin based on the "Issues" section of the repository.
+This blog is essentially a GitHub repository, where some of the repository's features are transformed via GitHub Pages, Jekyll, and Gitalk to become features of a blog site. [GitHub Pages](https://pages.github.com/) is a static site hosting service that can host webpages from a GitHub repository. [Jekyll](https://jekyllrb.com/) is a static site generator that, when used with GitHub Pages, serves to update all the pages on the blog every time a commit to the associated repository is made. [Gitalk](https://github.com/gitalk/gitalk) is a comment plugin based on the "Issues" section of GitHub repositories.
 
 
 
