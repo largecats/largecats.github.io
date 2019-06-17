@@ -150,7 +150,7 @@ Customize this header for each post. The rest is the same as writing in markdown
 
 **10. Local preview**
 
-It is generally a good idea to preview the blog post before pushing it to GitHub, which would publish it at `https://username.github.io/`. Here's how to do it:
+It is generally a good idea to preview the blog post before pushing it to GitHub, which would publish it at `https://username.github.io/`. Here's how to do it.
 
 1. Open cmd.
 2. `cd` to the local repository.
