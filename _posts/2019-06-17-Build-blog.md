@@ -106,7 +106,7 @@ The theme template this blog uses has a comment feature that uses Disqus. I modi
 
     E.g., I wanted to have comment sections at the end of each post and the "Archives" page. So I pasted the above code at the end of `/_layouts/post.html` and `/page/0archives.html`.
 
-To view the resulting comment box at this step:
+To view the resulting comment section at this step:
 1. Follow step 11 to push to GitHub.
 
     **Caveat.** If the blog site is launched locally (as in step 10) without pushing to Github, a message like
@@ -117,9 +117,9 @@ To view the resulting comment box at this step:
     ```
     would appear at the position of the comment sections, and clicking on "Login with Github" would navigate back to the blog site at `https://username.github.io`.
 2. Wait for 30s and visit the blog site at `https://username.github.io/`.
-3. Open the pages that have comment sections and follow the instructions to initialize comment. If this is the first time a comment is ever initialized at the blog site, a prompt for authentication may appear. Otherwise, it seems that opening the pages is enough.
+3. Open each page that contains a comment section and follow the instructions to initialize issue comment. If this is the first time a comment is ever initialized at the blog site, a prompt for authentication may appear. Otherwise, it seems that opening the pages is enough.
 
-    This creates an issue for each page at the blog's GitHub repository. Any future comments would become comments under the corresponding issue in the repository.
+    This creates an issue for each page at the blog's GitHub repository. Any future comments on the page would become comments under the corresponding issue in the repository.
 
 **Caveat.** The blog posts are generated from `.md` files in the `_posts` folder in the repository. The names of these `.md` files cannot be longer than 50 characters, otherwise an `Error: Validation Failed` error would occur at the comment sections. The reason is follows. 
 
