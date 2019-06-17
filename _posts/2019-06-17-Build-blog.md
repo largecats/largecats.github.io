@@ -115,9 +115,9 @@ To view the resulting comment box at this step:
     Please contact @username to initialize comment.
     Login with Github
     ```
-    would appear at the position of the comment sections
+    would appear at the position of the comment sections, and clicking on "Login with Github" would navigate back to the blog site at `https://username.github.io`.
 2. Wait for 30s and visit the blog site at `https://username.github.io/`.
-3. Open the pages that have comment sections to initialize comment. 
+3. Open the pages that have comment sections and follow the instructions to initialize comment. If this is the first time a comment is ever initialized at the blog site, a prompt for authentication may appear. Otherwise, it seems that opening the pages is enough.
 
     This creates an issue for each page at the blog's GitHub repository. Any future comments would become comments under the corresponding issue in the repository.
 
