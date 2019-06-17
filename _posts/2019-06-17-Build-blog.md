@@ -80,7 +80,7 @@ The theme template this blog uses has a comment feature that uses Disqus. I modi
     ![](/images/OAuth-application.png){:width="450px"}
 
     Note down the client id and the client secret key.
-2. Paste the following code at the end of the pages where the comment function is to be enabled (if necessary, comment out all the Disqus containers first). Then customize the Gitalk parameters by filling in one's own information. 
+2. Paste the following code at the end of the pages where the comment sections are to be placed (if necessary, comment out all the Disqus containers first). Then customize the Gitalk parameters by filling in one's own information. 
     ```html
     <!-- Gitalk comment start  -->
 
