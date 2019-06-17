@@ -1,4 +1,4 @@
+Personal blog.
 
-
-Jekyll theme by [Gaohaoyang](https://github.com/Gaohaoyang/gaohaoyang.github.io)
+Jekyll theme by [Gaohaoyang](https://github.com/Gaohaoyang/gaohaoyang.github.io).
 
