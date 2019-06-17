@@ -34,7 +34,7 @@ On the repository page, go to "Settings" and then "GitHub Pages". Choose a theme
 
 Clone the repository to a local folder.
 
-The next two steps enable launching the blog site locally (shown in step 10), so that one may preview the blog site before pushing it to GitHub.
+The next two steps enable launching the blog site for local preview (shown in step 10) before pushing it to GitHub.
 
 **4. Install Ruby**
 
