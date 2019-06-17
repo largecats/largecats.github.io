@@ -67,7 +67,7 @@ At this step, if one follows step 10 and launches the blog site locally, the blo
 
 **7. Customize theme parameters**
 
-The jekyll theme is like a blog site template. One may customize the template by filling in their own user information, such as blog title, GitHub username, email address, in the blog site's main page, header, footer, etc.
+The jekyll theme is like a blog site template. One may customize the template by filling in their own user information, such as blog title, GitHub username, and email address in the blog site's main page, header, footer, etc.
 
 **8. Set up Gitalk**
 
@@ -104,7 +104,7 @@ The theme template this blog uses has a comment feature that uses Disqus. I modi
     <!-- Gitalk end -->
     ```
 
-    E.g., I wanted to have a comment section at the end of each post and the "Archives" page. So I pasted the above code at the end of `/_layouts/post.html` and `/page/0archives.html`.
+    E.g., I wanted to put a comment section at the end of each post and the "Archives" page. So I pasted the above code at the end of `/_layouts/post.html` and `/page/0archives.html`.
 
 To view the resulting comment sections at this step:
 1. Follow step 11 to push to GitHub.
