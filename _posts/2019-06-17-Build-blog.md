@@ -117,7 +117,7 @@ To view the resulting comment sections at this step:
     ```
     would appear at the comment sections, and clicking on "Login with Github" would navigate back to the blog site at `https://username.github.io`.
 2. Wait for 30s and visit the blog site at `https://username.github.io/`.
-3. Open each page with a comment section and follow the instructions to initialize issue comment. If this is the first time a comment is ever initialized at the blog site, a prompt for authentication may appear. Otherwise, it seems that opening the pages is enough.
+3. Open each page with a comment section and click on "Login with GitHub" at the comment section to initialize issue comment. If this is the first time a comment is ever initialized at the blog site, a prompt for authentication may appear. Otherwise, it seems that opening the pages is enough.
 
     This creates an issue for each page with a comment section at the blog's GitHub repository. Any future comments on a page would become comments under the corresponding issue in the repository.
 
