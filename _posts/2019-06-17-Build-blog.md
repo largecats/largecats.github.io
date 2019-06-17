@@ -77,8 +77,8 @@ The theme template this blog uses has a comment feature that uses Disqus. I modi
 
     "Application name" is the name of the blog site's GitHub repository. "Homepage URL" is the url of the blog site. "Authorization callback URL" is the same as "Homepage URL". E.g.,
 
-    ![h](https://github.com/largecats/largecats.github.io/blob/master/images/OAuth-application.png){:height="700px" width="400px"}
-2. Paste the following code at the end of the pages where comment function is to be enabled.
+    ![h](/images/OAuth-application.png){:height="550px" width="500px"}
+2. Paste the following code at the end of the pages where the comment function is to be enabled.
     ```html
     <!-- Gitalk comment start  -->
 
@@ -101,6 +101,8 @@ The theme template this blog uses has a comment feature that uses Disqus. I modi
     </script> 
     <!-- Gitalk end -->
     ```
+
+    E.g., I
 
 **9. Write blog**
 
