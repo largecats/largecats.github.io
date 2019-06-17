@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Build blog with GitHub Pages, Jekyll, and Gitalk"
+title:  "Building blog with GitHub Pages, Jekyll, and Gitalk"
 date:   2019-06-17
 categories: life-saver
 tags: github-pages jekyll gitalk windows
@@ -76,7 +76,8 @@ The theme template this blog uses has a comment feature that uses Disqus. I modi
 1. Register an OAuth application [here](https://github.com/settings/applications/new).
 
     "Application name" is the name of the blog site's GitHub repository. "Homepage URL" is the url of the blog site. "Authorization callback URL" is the same as "Homepage URL". E.g.,
-    ![h](_posts/OAuth-application.png)
+
+    ![h](https://github.com/largecats/largecats.github.io/blob/master/images/OAuth-application.png){:height="700px" width="400px"}
 2. Paste the following code at the end of the pages where comment function is to be enabled.
     ```html
     <!-- Gitalk comment start  -->
