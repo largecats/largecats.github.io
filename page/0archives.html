@@ -68,22 +68,22 @@ type: page
 </div>
 <script src="{{ "/js/pageContent.js " | prepend: site.baseurl }}" charset="utf-8"></script>
 
-<!-- Gitalk 评论 start  -->
+<!-- Gitalk comment start  -->
 
-<!-- Link Gitalk 的支持文件  -->
+<!-- Link Gitalk  -->
 <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
 <script src="https://unpkg.com/gitalk@latest/dist/gitalk.min.js"></script> 
 <div id="gitalk-container"></div>     <script type="text/javascript">
     var gitalk = new Gitalk({
 
-    // gitalk的主要参数
+    // main parameters of Gitalk
 		clientID: '28c4c76758514846485c',
 		clientSecret: '30229db8b9b9091109cc3326c3eb5d179e2cf617',
 		repo: 'largecats.github.io',
 		owner: 'largecats',
 		admin: ['largecats'],
-		id: '/blog/page/0archives.html',
-    
+		// id: '/blog/page/0archives.html',
+    id: window.location.pathname,
     });
     gitalk.render('gitalk-container');
 </script> 
