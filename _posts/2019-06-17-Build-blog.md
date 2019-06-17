@@ -121,7 +121,7 @@ To view the resulting comment box at this step:
 
     This creates an issue for each page at the blog's GitHub repository. Any future comments would become comments under the corresponding issue in the repository.
 
-**Caveat.** The blog posts are generated from `.md` files in the `_posts` folder in the repository. The names of these `.md` files cannot be longer than 50 characters, otherwise an `Error: Validation Failed` error would occur. The reason is follows. 
+**Caveat.** The blog posts are generated from `.md` files in the `_posts` folder in the repository. The names of these `.md` files cannot be longer than 50 characters, otherwise an `Error: Validation Failed` error would occur at the comment sections. The reason is follows. 
 
 Each blog post is a page, and as Gitalk creates an issue for each page, the names of those `.md` files would become labels of the corresponding issues. E.g., this blog post is written in a `.md` file called `2019-06-17-Build-blog.md`, and the corresponding issue has labels `/2019/06/17/Build-blog` and `Gitalk`, as shown below.
 
