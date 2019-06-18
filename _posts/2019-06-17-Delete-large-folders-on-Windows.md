@@ -9,12 +9,12 @@ tags: windows dos
 * content
 {:toc}
 
-## Motivation
+## Problem
 I was updating my backup drive and needed to delete some huge folders on that drive. Deleting large folders in Windows explorer could take quite a while because Windows would first calculate the folder's size, which is time-consuming. Therefore, it would be great to know how to quickly delete huge folders on Windows.
 
 
 
-## Method
+## Solution
 Suppose the large folder to be deleted is called `foldername`.
 
 1. Open cmd.

@@ -10,15 +10,17 @@ tags: github-pages jekyll gitalk windows
 {:toc}
 
 ## Motivation
-I wanted to set up a technical blog free of charge. A quick search on the world wide web shows that building technical blog using GitHub Pages seems to be a popular option. This post demonstrates how this blog site was built on Windows using GitHub Pages, Jekyll, and Gitalk. I have used GitHub before but know very little about web development. This post should be suitable for readers with a similar background.
+I wanted to set up a technical blog free of charge. A quick search on the world wide web shows that building technical blog using GitHub Pages seems to be a popular option. This post demonstrates how this blog site was built on Windows using GitHub Pages, Jekyll, and Gitalk.
 
+## Pre-requisite
 
-
-This blog is essentially a GitHub repository, where some of the repository's features are transformed via GitHub Pages, Jekyll, and Gitalk to become features of a blog site. [GitHub Pages](https://pages.github.com/) is a static site hosting service that can host webpages from a GitHub repository. [Jekyll](https://jekyllrb.com/) is a static site generator that, when used with GitHub Pages, serves to update all the pages on the blog every time a commit to the associated repository is made. [Gitalk](https://github.com/gitalk/gitalk) is a comment plugin based on the "Issues" section of GitHub repositories.
+I have used GitHub before but know very little about web development. This post should be suitable for readers with a similar background.
 
 
 
 ## Method
+
+This blog is essentially a GitHub repository, where some of the repository's features are transformed via GitHub Pages, Jekyll, and Gitalk to become features of a blog site. [GitHub Pages](https://pages.github.com/) is a static site hosting service that can host webpages from a GitHub repository. [Jekyll](https://jekyllrb.com/) is a static site generator that, when used with GitHub Pages, serves to update all the pages on the blog every time a commit to the associated repository is made. [Gitalk](https://github.com/gitalk/gitalk) is a comment plugin based on the "Issues" section of GitHub repositories.
 
 **1. Create a repository**
 
