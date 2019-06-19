@@ -52,8 +52,8 @@ pages = [str(i) for i in range(0,10)]
 names = []
 years = []
 genres = []
-imdb_ratings = []
-douban_ratings = []
+imdbRatings = []
+doubanRatings = []
 regions = []
 ```
 Now, for each page, we first make a get request using its url. This creates an object stored in the variable `response`, which allows us to obtain information we need about the page.
@@ -134,13 +134,13 @@ Luckily, the Douban page contains a link to the movie's IMDb page. So we can dir
 
 ```python
         # ender imdb movie page from douban
-        basic_info = doubanMoviePageHtml.find("div", attrs={"id":"info"})
+        basicInfo = doubanMoviePageHtml.find("div", attrs={"id":"info"})
         pattern = re.compile(r'IMDb链接: tt(\d{7})', flags=re.DOTALL)
-        imdb_id = pattern.findall(basic_info.text)[0]
-        imdb_url = "http://www.imdb.com/title/tt" + imdb_id + "/"
-        print(imdb_url)
+        imdbId = pattern.findall(basicInfo.text)[0]
+        imdbUrl = "http://www.imdb.com/title/tt" + imdbId + "/"
+        print(imdbUrl)
 
-        imdbMoviePage = requests.get(imdb_url)
+        imdbMoviePage = requests.get(imdbUrl)
         imdbMoviePageHtml = BeautifulSoup(imdbMoviePage.text, "lxml")
 ```
 Scraping genre, region, and imdb rating is similar to the above. After we are done, simply combine the lists to a dataframe and write it to a `.csv` file.
@@ -208,7 +208,7 @@ PACKAGE CONTENTS
 ```
 We will be using chromedriver, which can be downloaded [here](http://chromedriver.chromium.org/). We add some further tweaks to disable image-loading in order to save time. We also set a timeout limit of 30s. Then we go to the Douban site.
 ```python
-chromedriver = "path_to\chromedriver.exe"
+chromedriver = "path-to\chromedriver.exe"
 os.environ["webdriver.chrome.driver"] = chromedriver
 options = webdriver.ChromeOptions()
 # do not load images  
@@ -288,11 +288,11 @@ Scraping the movies' Douban ratings is intuitive. Just like using a browser, we 
     containers = searchPageHtml.find_all('div', class_ = 'item-root')
     j = 0
     while j < len(containers):
-        first_container = containers[j]
-        titleInfo = first_container.find('div', class_="title").text
+        firstContainer = containers[j]
+        titleInfo = firstContainer.find('div', class_="title").text
         # only scrape rating if result has matching title and year
         if name in titleInfo and year in titleInfo:
-            doubanRating = float(first_container.find("span", class_ = "rating_nums").text)
+            doubanRating = float(firstContainer.find("span", class_ = "rating_nums").text)
             break
         else:
             j += 1
