@@ -156,7 +156,7 @@ movieInfo.index = movieInfo.index + 1
 print(movieInfo.info())
 print(movieInfo.head(10))
 fileName = "DoubanTop250vsIMDB.csv"
-movieInfo.to_csv(fileName, sep=",", encoding = "utf-8", index=False)
+movieInfo.to_csv(fileName, sep = ",", encoding = "utf-8", index = False)
 ```
 The resulting data file looks something like this:
 
@@ -314,7 +314,7 @@ movieInfo.index = movieInfo.index + 1
 print(movieInfo.info())
 print(movieInfo.head(10))
 fileName = "IMDBTop250vsDouban.csv"
-movieInfo.to_csv(fileName, sep=",", encoding = "utf-8", index=False)
+movieInfo.to_csv(fileName, sep = ",", encoding = "utf-8", index = False)
 ```
 The resulting data file looks something like this:
 
