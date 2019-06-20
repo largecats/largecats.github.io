@@ -84,7 +84,7 @@ Luckily, speech bubbles have a small range of sizes. Thus, we can filter out the
 <sup>Page 01 of Transformers: Megatron Origin #1 with rectangle contours after filtering.</sup>
 </div>
 
-To help with contour detection, before the steps above, we turn the image into gray scale, filter out noise, and add some filters to make the edges sharper. Finally, we wrap these code in a function for convenience. This function returns a list of candidate speech bubbles as images.
+To help with contour detection, before the steps above, we turn the image into gray scale, filter out noise, and add some filters to make the edges sharper. For convenice, we define the following function to do all the above. The function returns a list of candidate speech bubbles as images.
 ```python
 # find all speech bubbles in the given comic page and return a list of cropped speech bubbles (with possible false positives)
 def findSpeechBubbles(imagePath, method = 'simple'):
@@ -115,6 +115,7 @@ def findSpeechBubbles(imagePath, method = 'simple'):
 
     return croppedImageList
 ```
+Somehow, images cropped this way (via the `image[y:y+h, x:x+w]` syntax) are not as good for OCR as images cropped using external programs, such as QQ. But I did not figure out a way to use external programs to crop the images and feed it to the OCR engine, so this would have to be a game of another day.
 
 #### Feeding speech bubbles to Tesseract
 
