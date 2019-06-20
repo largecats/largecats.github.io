@@ -70,18 +70,18 @@ import csv
 
 #### Detecting speech bubbles
 
-First of all, we need to find all (or as many as possible) speech bubbles in a given comic page. Luckily, speech bubbles usually have relatively well-defined edges and mostly rectangular shapes. To exploit these properties in detecting speech bubbles, we use the `findContours()` function from `cv2` to recognize edges in the comic page and bound them using rectangles via `boundingRect()`. As shown below, `findContours()` picks up a lot of noise that are not speech bubbles. 
+First of all, we need to find all (or as many as possible) speech bubbles in a given comic page. Luckily, speech bubbles usually have relatively well-defined edges and mostly rectangular shapes. To exploit these properties in detecting speech bubbles, we use the `findContours()` function from `cv2` to recognize edges in the comic page and bound them using rectangles (`boundingRect()`), which would then become the speech bubble candidates. As shown below, `findContours()` picks up a lot of noise that are not speech bubbles. 
 
 <div style="text-align: center"><img src="/images/all_rectangles.png" width="450px" /></div>
 <div align="center">
-<sup>Page 01 of Transformers: Megatron Origin #1 with rectangle contours before filtering.</sup>
+<sup>Page 01 of Transformers: Megatron Origin #1 with speech bubble candidates (in green) before filtering.</sup>
 </div>
 
-Luckily, speech bubbles have a small range of sizes. Thus, we can filter out the contour rectangles that are unlikely to be speech bubbles because they are either too large or too small, as shown below.
+Luckily, speech bubbles have a small range of sizes. Thus, we can filter out the candidates that are unlikely to be speech bubbles because they are either too large or too small, as shown below.
 
 <div style="text-align: center"><img src="/images/filtered_rectangles.png" width="450px" /></div>
 <div align="center">
-<sup>Page 01 of Transformers: Megatron Origin #1 with rectangle contours after filtering.</sup>
+<sup>Page 01 of Transformers: Megatron Origin #1 with speech bubble candidates (in green) after filtering.</sup>
 </div>
 
 To help with contour detection, before the steps above, we turn the image into gray scale, filter out noise, and add some filters to make the edges sharper. For convenice, we define the following function to do all the above. The function returns a list of candidate speech bubbles as images.
@@ -190,7 +190,7 @@ The main work is done as follows. For each comic page in the root directory, we 
 
 ```python
 # initialize output file
-with open(outputFilePath, 'w',newline="") as f:
+with open(outputFilePath, 'w',newline = "") as f:
     writer = csv.writer(f)
     writer.writerow(['filePath', 'script'])
 
@@ -209,8 +209,8 @@ for imagePath in looper(rootDir):
         # denoise
         croppedImage = denoise(croppedImage, 2)
         kernel = np.ones((1, 1), np.uint8)
-        croppedImage = cv2.dilate(croppedImage, kernel, iterations=50)
-        croppedImage = cv2.erode(croppedImage, kernel, iterations=50)
+        croppedImage = cv2.dilate(croppedImage, kernel, iterations = 50)
+        croppedImage = cv2.erode(croppedImage, kernel, iterations = 50)
 
         # turn gray
         croppedImageGray = cv2.cvtColor(croppedImage, cv2.COLOR_BGR2GRAY)
@@ -236,7 +236,7 @@ The resulting data file looks like this:
 
 ![](/images/ocr-result.png){:width="800px"}
 
-There are still noises, but at least most of the comic script are picked up reasonably well. This enough for our purpose, since we technically only need sparsely distributed individual words that are correctly recognized.
+There are still noises, but at least most of the comic script are picked up reasonably well. This is enough for our purpose, since we technically only need a relatively small number of sparsely distributed individual words that are correctly recognized.
 
 Here is an example of the image message that can be composed from the dictionary built above.
 
