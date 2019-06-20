@@ -22,7 +22,7 @@ In the motion comic, a video message is composed by putting together footage fro
 
 ## Preparation
 
-I read [this article](https://www.pyimagesearch.com/2017/07/10/using-tesseract-ocr-python/) about the OCR engine tessearct and [this one](https://docs.opencv.org/3.3.0/d7/d4d/tutorial_py_thresholding.html) about OpenCV.
+I read [this article](https://www.pyimagesearch.com/2017/07/10/using-tesseract-ocr-python/) about the OCR engine Tesseract and [this one](https://docs.opencv.org/3.3.0/d7/d4d/tutorial_py_thresholding.html) about OpenCV.
 
 
 
