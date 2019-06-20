@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Deleting large folders on Windows"
-date:   2019-06-15
+date:   2019-06-17
 categories: life-saver
 tags: windows dos
 ---
