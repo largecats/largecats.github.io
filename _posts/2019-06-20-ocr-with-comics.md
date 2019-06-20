@@ -72,14 +72,14 @@ import csv
 
 First of all, we need to find all (or as many as possible) speech bubbles in a given comic page. Luckily, speech bubbles usually have relatively well-defined edges and mostly rectangular shapes. To exploit these properties in detecting speech bubbles, we use the `findContours()` function from `cv2` to recognize edges in the comic page and bound them using rectangles via `boundingRect()`. As shown below, `findContours()` picks up a lot of noise that are not speech bubbles. 
 
-<div style="text-align: center"><img src="/images/all_rectangles.jpg" width="450px" /></div>
+<div style="text-align: center"><img src="/images/all_rectangles.png" width="450px" /></div>
 <div align="center">
 <sup>Page 01 of Transformers: Megatron Origin #1 with rectangle contours before filtering.</sup>
 </div>
 
 Luckily, speech bubbles have a small range of sizes. Thus, we can filter out the contour rectangles that are unlikely to be speech bubbles because they are either too large or too small, as shown below.
 
-<div style="text-align: center"><img src="/images/filtered_rectangles.jpg" width="450px" /></div>
+<div style="text-align: center"><img src="/images/filtered_rectangles.png" width="450px" /></div>
 <div align="center">
 <sup>Page 01 of Transformers: Megatron Origin #1 with rectangle contours after filtering.</sup>
 </div>
