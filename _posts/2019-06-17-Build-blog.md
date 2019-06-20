@@ -12,7 +12,7 @@ tags: github-pages jekyll gitalk windows
 ## Motivation
 I wanted to set up a technical blog free of charge. A quick search on the world wide web shows that building technical blog using GitHub Pages seems to be a popular option. This post demonstrates how this blog site was built on Windows using GitHub Pages, Jekyll, and Gitalk.
 
-## Pre-requisite
+## Preparation
 
 I have used GitHub before but know very little about web development. This post should be suitable for readers with a similar background.
 
@@ -79,7 +79,7 @@ The theme template this blog uses has a comment feature that uses Disqus. I modi
 
     "Application name" is the name of the blog site's GitHub repository. "Homepage URL" is the url of the blog site. "Authorization callback URL" is the same as "Homepage URL". E.g.,
 
-    ![](/images/OAuth-application.png){:width="450px"}
+    <div style="text-align: center"><img src="/images/OAuth-application.png" width="450px" /></div>
 
     Note down the client id and the client secret key.
 2. Paste the following code at the end of the pages where the comment sections are to be placed (if necessary, comment out all the Disqus containers first). Then customize the Gitalk parameters by filling in one's own information. 

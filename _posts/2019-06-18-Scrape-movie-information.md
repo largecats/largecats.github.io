@@ -13,9 +13,9 @@ tags: web-scraping regular-expression python html
 
 I wondered how movies at [Douban](https://movie.douban.com/) compare to those at [IMDb](https://www.imdb.com/). I also wanted to learn web scraping as it was a required skill for a course I was going to take the following semester (otherwise I would have gone with API). So I decided to use web scraping to collect data on the top 250 movies at Douban and those at IMDb and do some comparative analyses.
 
-## Pre-requisite
+## Preparation
 
-I read [this article](https://www.dataquest.io/blog/web-scraping-beautifulsoup/) as preparation.
+I read [this article](https://www.dataquest.io/blog/web-scraping-beautifulsoup/).
 
 
 

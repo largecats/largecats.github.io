@@ -17,6 +17,8 @@ This application failed to start because it could not find or load the Qt platfo
 Reinstalling the application may fix this problem. 
 ```
 
+
+
 ## Solution
 
 Type
