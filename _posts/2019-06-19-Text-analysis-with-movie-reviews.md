@@ -15,7 +15,7 @@ When [*Bumblebee*](https://www.imdb.com/title/tt4701182/) was released, I wanted
 
 ## Preparation
 
-I read [this article](https://www.datacamp.com/community/tutorials/text-analytics-beginners-nltk) and [this documentation](https://amueller.github.io/word_cloud/auto_examples/a_new_hope.html).
+I read [this article](https://www.datacamp.com/community/tutorials/text-analytics-beginners-nltk) about NLTK and [this documentation](https://amueller.github.io/word_cloud/auto_examples/a_new_hope.html) about a module for word cloud.
 
 
 
@@ -155,34 +155,34 @@ Below is a wordcloud of the reviews for *Bumblebee*, followed by that of the rev
 
 ![](/images/BBB-review-wordcloud.png){:width="800px"}
 <div align="center">
-Word cloud of movies reviews of Bumblebee.
+<sup>Word cloud of movies reviews of Bumblebee.</sup>
 </div>
 
 ![](/images/BBB-title-wordcloud.png){:width="800px"}
 <div align="center">
-Word cloud of movie review titles of Bumblebee.
+<sup>Word cloud of movie review titles of Bumblebee.</sup>
 </div>
 
 The wordcloud of the movie review titles seems to contain less noise, or uninformative words. This is expected as the reviews have not been filtered for words of importance using metrics such as the [TF-IDF score](http://www.tfidf.com/). In light of this, I generated word clouds from the titles of movie reviews of some of the other movies in the franchise, listed below.
 
 ![](/images/G1_wordcloud.png){:width="800px"}
 <div align="center">
-<a href = "https://www.imdb.com/title/tt0086817/reviews?sort=helpfulnessScore&dir=desc&ratingFilter=0">G1</a>.
+<sup><a href = "https://www.imdb.com/title/tt0086817/reviews?sort=helpfulnessScore&dir=desc&ratingFilter=0">G1</a>.</sup>
 </div>
 
 ![](/images/G1_The_Movie_wordcloud.png){:width="800px"}
 <div align="center">
-<a href = "https://www.imdb.com/title/tt0092106/reviews?sort=helpfulnessScore&dir=desc&ratingFilter=0">G1 The Movie</a>.
+<sup><a href = "https://www.imdb.com/title/tt0092106/reviews?sort=helpfulnessScore&dir=desc&ratingFilter=0">G1 The Movie</a>.</sup>
 </div>
 
 ![](/images/TF1_wordcloud.png){:width="800px"}
 <div align="center">
-<a href = "https://www.imdb.com/title/tt0418279/reviews?sort=helpfulnessScore&dir=desc&ratingFilter=0">Transformers (2007)</a>.
+<sup><a href = "https://www.imdb.com/title/tt0418279/reviews?sort=helpfulnessScore&dir=desc&ratingFilter=0">Transformers (2007)</a>.</sup>
 </div>
 
 ![](/images/TF2_wordcloud.png){:width="800px"}
 <div align="center">
-<a href = "https://www.imdb.com/title/tt1055369/reviews?sort=helpfulnessScore&dir=desc&ratingFilter=0">Transformers: Revenge of the Fallen</a>.
+<sup><a href = "https://www.imdb.com/title/tt1055369/reviews?sort=helpfulnessScore&dir=desc&ratingFilter=0">Transformers: Revenge of the Fallen</a>.</sup>
 </div>
 
 ![](/images/TF3_wordcloud.png){:width="800px"}
@@ -192,12 +192,12 @@ The wordcloud of the movie review titles seems to contain less noise, or uninfor
 
 ![](/images/TF4_wordcloud.png){:width="800px"}
 <div align="center">
-<a href = "https://www.imdb.com/title/tt2109248/reviews?sort=helpfulnessScore&dir=desc&ratingFilter=0">Transformers: Age of Extinction</a>.
+<sup><a href = "https://www.imdb.com/title/tt2109248/reviews?sort=helpfulnessScore&dir=desc&ratingFilter=0">Transformers: Age of Extinction</a>.</sup>
 </div>
 
 ![](/images/TF5_wordcloud.png){:width="800px"}
 <div align="center">
-<a href = "https://www.imdb.com/title/tt3371366/reviews?sort=helpfulnessScore&dir=desc&ratingFilter=0">Transformers: The Last Knight</a>.
+<sup><a href = "https://www.imdb.com/title/tt3371366/reviews?sort=helpfulnessScore&dir=desc&ratingFilter=0">Transformers: The Last Knight</a>.</sup>
 </div>
 
 The trend is consistent with the IMDb ratings.
@@ -283,42 +283,42 @@ Histograms of the polarity scores (compound) for the review titles of the 8 movi
 
 <div style="text-align: center"><img src="/images/G1_polarity_scores.png" width="600px" /></div>
 <div align="center">
-<a href = "https://www.imdb.com/title/tt0086817/reviews?sort=helpfulnessScore&dir=desc&ratingFilter=0">G1</a>.
+<sup><a href = "https://www.imdb.com/title/tt0086817/reviews?sort=helpfulnessScore&dir=desc&ratingFilter=0">G1</a>.</sup>
 </div>
 
 <div style="text-align: center"><img src="/images/G1_The_Movie_polarity_scores.png" width="600px" /></div>
 <div align="center">
-<a href = "https://www.imdb.com/title/tt0092106/reviews?sort=helpfulnessScore&dir=desc&ratingFilter=0">G1 The Movie</a>.
+<sup><a href = "https://www.imdb.com/title/tt0092106/reviews?sort=helpfulnessScore&dir=desc&ratingFilter=0">G1 The Movie</a>.</sup>
 </div>
 
 <div style="text-align: center"><img src="/images/TF1_polarity_scores.png" width="600px" /></div>
 <div align="center">
-<a href = "https://www.imdb.com/title/tt0418279/reviews?sort=helpfulnessScore&dir=desc&ratingFilter=0">Transformers (2007)</a>.
+<sup><a href = "https://www.imdb.com/title/tt0418279/reviews?sort=helpfulnessScore&dir=desc&ratingFilter=0">Transformers (2007)</a>.</sup>
 </div>
 
 <div style="text-align: center"><img src="/images/TF2_polarity_scores.png" width="600px" /></div>
 <div align="center">
-<a href = "https://www.imdb.com/title/tt1055369/reviews?sort=helpfulnessScore&dir=desc&ratingFilter=0">Transformers: Revenge of the Fallen</a>.
+<sup><a href = "https://www.imdb.com/title/tt1055369/reviews?sort=helpfulnessScore&dir=desc&ratingFilter=0">Transformers: Revenge of the Fallen</a>.</sup>
 </div>
 
 <div style="text-align: center"><img src="/images/TF3_polarity_scores.png" width="600px" /></div>
 <div align="center">
-<a href = "https://www.imdb.com/title/tt1399103/reviews?sort=helpfulnessScore&dir=desc&ratingFilter=0">Transformers: Dark of the Moon</a>.
+<sup><a href = "https://www.imdb.com/title/tt1399103/reviews?sort=helpfulnessScore&dir=desc&ratingFilter=0">Transformers: Dark of the Moon</a>.</sup>
 </div>
 
 <div style="text-align: center"><img src="/images/TF4_polarity_scores.png" width="600px" /></div>
 <div align="center">
-<a href = "https://www.imdb.com/title/tt2109248/reviews?sort=helpfulnessScore&dir=desc&ratingFilter=0">Transformers: Age of Extinction</a>.
+<sup><a href = "https://www.imdb.com/title/tt2109248/reviews?sort=helpfulnessScore&dir=desc&ratingFilter=0">Transformers: Age of Extinction</a>.</sup>
 </div>
 
 <div style="text-align: center"><img src="/images/TF5_polarity_scores.png" width="600px" /></div>
 <div align="center">
-<a href = "https://www.imdb.com/title/tt3371366/reviews?sort=helpfulnessScore&dir=desc&ratingFilter=0">Transformers: The Last Knight</a>.
+<sup><a href = "https://www.imdb.com/title/tt3371366/reviews?sort=helpfulnessScore&dir=desc&ratingFilter=0">Transformers: The Last Knight</a>.</sup>
 </div>
 
 <div style="text-align: center"><img src="/images/BBB_polarity_scores.png" width="600px" /></div>
 <div align="center">
-<a href = "https://www.imdb.com/title/tt4701182/reviews?sort=helpfulnessScore&dir=desc&ratingFilter=0">Bumblebee</a>.
+<sup><a href = "https://www.imdb.com/title/tt4701182/reviews?sort=helpfulnessScore&dir=desc&ratingFilter=0">Bumblebee</a>.</sup>
 </div>
 
 Most sentences are recognized as neutral, yet the trend of negative and positive tendencies seems to agree with the word clouds.

@@ -15,7 +15,7 @@ I wondered how movies at [Douban](https://movie.douban.com/) compare to those at
 
 ## Preparation
 
-I read [this article](https://www.dataquest.io/blog/web-scraping-beautifulsoup/).
+I read [this article](https://www.dataquest.io/blog/web-scraping-beautifulsoup/) about BeautifulSoup.
 
 
 

@@ -21,7 +21,7 @@ Reinstalling the application may fix this problem.
 
 ## Solution
 
-Type
+The solution that worked for me was to type
 ```
 pip install pyqt5
 ```
