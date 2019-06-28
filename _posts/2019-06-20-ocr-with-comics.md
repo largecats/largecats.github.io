@@ -238,7 +238,7 @@ The resulting data file looks like this:
 
 There are still noises, but at least most of the comic script are picked up reasonably well. This is enough for our purpose, since we technically only need a relatively small number of sparsely distributed individual words that are correctly recognized.
 
-Here is an example of the image message that can be composed from the dictionary built above.
+<!-- Here is an example of the image message that can be composed from the dictionary built above.
 
-<div style="text-align: center"><img src="/images/comic-ocr-message.png" width="400px" /></div>
+<div style="text-align: center"><img src="/images/comic-ocr-message.png" width="400px" /></div> -->
 
