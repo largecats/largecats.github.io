@@ -97,7 +97,7 @@ for word in words:
         filteredWords.append(word.lower())
 words = filteredWords
 ```
-We also need to do lemmatization, that is, to "normalize" the words by restoring all variations (e.g., past tense, pural form) back to their original form. To do so, we first tag the words as verb, proposition, adjective, etc, and then convert them to their original forms accordingly.
+We also need to do lemmatization, that is, to "normalize" the words by restoring all variations (e.g., past tense, pural form) back to their original form. To do so, we first tag the words as verb, proposition, adjective, etc, and then convert them to their original forms accordingly. E.g., "movies" becomes "movie", "watched" becomes "watch".
 ```python
 # pos Tagging
 tags = nltk.pos_tag(words)
