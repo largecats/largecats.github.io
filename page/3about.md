@@ -11,7 +11,7 @@ type: page
 
 ### About me
 
-Lover of movie, movie soundtracks, comics, and anything fictional. Occasionally student of mathematics, computer science, and statistics.
+Lover of movies, movie soundtracks, comics, and everything fictional. Occasionally student of mathematics, computer science, and statistics.
 
 [GitHub](https://github.com/largecats)
 
