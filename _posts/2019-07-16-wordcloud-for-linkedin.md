@@ -13,11 +13,11 @@ tags: python wordcloud text-analysis
 
 I wanted a background photo for my LinkedIn account. Generating a wordcloud image from my LinkedIn profile seems a good idea.
 
-
-
 ## Preparation
 
 Same as [this blog post](https://largecats.github.io/2019/06/19/Text-analysis-with-movie-reviews/).
+
+
 
 ## Method
 
