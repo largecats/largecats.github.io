@@ -15,7 +15,7 @@ I wanted to turn a list of addresses into coordinates and display them on a map 
 
 ## Preparation
 
-I read [Google Map's guide on API key](https://developers.google.com/maps/documentation/javascript/get-api-key).
+I read [Google Map's guide on API key](https://developers.google.com/maps/documentation/embed/get-api-key).
 
 
 
