@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Setting up Spark on Windows"
-date:   2019-07-31
+date:   2019-07-31 14:11
 categories: work
 tags: spark pyspark scala
 ---
@@ -11,7 +11,7 @@ tags: spark pyspark scala
 
 ## Motivation
 
-I wanted to set up Spark on Windows.
+I want to set up Spark on Windows.
 
 ## Preparation
 

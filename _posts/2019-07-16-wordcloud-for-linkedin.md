@@ -11,7 +11,7 @@ tags: python wordcloud text-analysis
 
 ## Motivation
 
-I wanted a background photo for my LinkedIn account. Generating a wordcloud image from my LinkedIn profile seems a good idea.
+I want a background photo for my LinkedIn account. Generating a wordcloud image from my LinkedIn profile seems a good idea.
 
 ## Preparation
 
