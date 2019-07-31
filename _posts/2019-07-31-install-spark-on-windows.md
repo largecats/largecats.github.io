@@ -11,7 +11,7 @@ tags: spark pyspark scala
 
 ## Motivation
 
-I want to set up Spark on Windows.
+I want to install Spark on my PC.
 
 ## Preparation
 
