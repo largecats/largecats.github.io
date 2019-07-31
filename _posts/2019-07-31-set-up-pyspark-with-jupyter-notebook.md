@@ -79,4 +79,4 @@ There are two ways to set up PySpark with Jupyter Notebook. They are explained i
     ![](/images/findspark-tryout.png){:width="800px"}
 
 
-Note that option 1 does not require manually creating a `SparkContext` instance, while option 2 does. As a result, if the notebook created in option 1 is not opened from PySpark but from a regular Jupyter Notebook, the `sc` variable would not be recognized. Vice versa, if the notebook created in option 2 is opened from PySpark, the line `sc = pyspark.SparkContext()` would be redundant, and the program would raise an error saying that only one `SparkContext` can be run at once.
+Note that option 1 does not require manually creating a `SparkContext` object, while option 2 does. As a result, if the notebook created in option 1 is not opened from PySpark but from a regular Jupyter Notebook, the `sc` variable would not be recognized. Vice versa, if the notebook created in option 2 is opened from PySpark, the line `sc = pyspark.SparkContext()` would be redundant, and the program would raise an error saying that only one `SparkContext` can be run at once.
