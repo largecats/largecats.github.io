@@ -55,22 +55,24 @@ This is where the executable will be placed.
 2. Open `helloworld/.vscode/c_cpp_properties.json`, the file should look like this
 ```
 {
-  "configurations": [
-    {
-      "name": "Win32",
-      "defines": ["_DEBUG", "UNICODE", "_UNICODE"],
-      "compilerPath": "/usr/bin/g++",
-      "cStandard": "c11",
-      "cppStandard": "c++17",
-      "intelliSenseMode": "${default}",
-      "browse": {
-        "path": ["${workspaceFolder}"],
-        "limitSymbolsToIncludedHeaders": true,
-        "databaseFilename": ""
-      }
-    }
-  ],
-  "version": 4
+    "configurations": [
+        {
+            "name": "Win32",
+            "includePath": [
+                "${workspaceFolder}/**"
+            ],
+            "defines": [
+                "_DEBUG",
+                "UNICODE",
+                "_UNICODE"
+            ],
+            "compilerPath": "/usr/bin/gcc",
+            "cStandard": "c11",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "gcc-x64"
+        }
+    ],
+    "version": 4
 }
 ```
 1. In VS Code, go to `View > Command Palette > Configure Default Build Task > Create tasks.json file from template > Others`. In the `tasks.json` file that just popped up, paste the following content, replacing `<linux user name>` with your Linux username.
