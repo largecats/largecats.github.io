@@ -51,7 +51,7 @@ This is where the executable will be placed.
 2. In Windows, create a folder `helloworld`.
 
 ### Configure VS Code
-1. In VS Code, press `Ctrl+Shift+P`, type `C/C++` and select `Edit Configurations (UI)`. Set `Compiler path` to `/usr/bin/g++` and `IntelliSense mode` to `gcc-x64`.
+1. In VS Code, press `Ctrl+Shift+P`, type `C/C++` and select `Edit Configurations (UI)`. Set `Compiler path` to `/usr/bin/gcc` and `IntelliSense mode` to `gcc-x64`.
 2. Open `helloworld/.vscode/c_cpp_properties.json`, the file should look like this
 ```
 {
