@@ -122,7 +122,7 @@ This is where the executable will be placed.
   }
 ```
 The task `build on WSL` builds the program and creates an executable `helloworld.out`. The task `run on WSL` runs the executable and prints the output in VS Code.
-4. In `json`, create a `launch.json` file and paste the following content, replacing `<linux username>` and `<windows username>` with your Linux and Windows usernames, respectively.
+4. For debugging: In `json`, create a `launch.json` file and paste the following content, replacing `<linux username>` and `<windows username>` with your Linux and Windows usernames, respectively.
 ```
 {
   "version": "0.2.0",
@@ -187,7 +187,7 @@ Terminal will be reused by tasks, press any key to close it.
 ```
 
 ### Run the program executable
-`Ctrl-Shift-B > run on WSL` to fun the executable `/home/<linux username>/projects/helloworld/helloworld.out`. You should see the output 
+`Ctrl-Shift-B > run on WSL` to run the executable `/home/<linux username>/projects/helloworld/helloworld.out`. You should see the output 
 ```
 > Executing task: /home/<linux username>/projects/helloworld/helloworld.out <
 
