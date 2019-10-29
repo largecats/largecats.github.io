@@ -9,7 +9,11 @@ tags: pyspark spark
 * content
 {:toc}
 
-User defined function (udf) is a feature in (Py)Spark that allows user to define customized functions with column arguments. E.g.,
+User defined function (udf) is a feature in (Py)Spark that allows user to define customized functions with column arguments. This post summarizes some pitfalls when using udfs.
+
+
+
+E.g.,
 ```python
 # dataframe of channelids
 import pandas as pd
