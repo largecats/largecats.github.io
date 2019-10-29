@@ -13,7 +13,7 @@ User defined function (udf) is a feature in (Py)Spark that allows user to define
 
 
 
-E.g.,
+Example of udf:
 ```python
 # dataframe of channelids
 import pandas as pd
