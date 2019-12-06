@@ -21,6 +21,9 @@ tags: pyspark
 
 A cached RDD can only be unpersisted through a variable referencing it.
 
+
+
+
 ```sh
 >>> l = [('Alice', 1)]
 >>> df = spark.createDataFrame(l) # create sample dataframe
