@@ -21,7 +21,7 @@ Same as [this blog post](https://largecats.github.io/2019/06/19/Text-analysis-wi
 
 ## Method
 
-All code can be found [here](https://github.com/largecats/wordcloud-for-linkedin-background).
+All code can be found [here](https://github.com/largecats/text-analysis/blob/master/wordcloud).
 
 ### Obtain a text version of LinkedIn profile
 

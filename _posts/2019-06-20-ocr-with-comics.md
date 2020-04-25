@@ -39,7 +39,7 @@ OCR is the conversion of images of text into machine-encoded text. We will use i
  | C:/comics/issue01/page02.jpg | EACH A COG IN THE GREAT MACHINE.                 |
  | ...                          | ...                                              |
 
-All code can be found [here](https://github.com/largecats/ocr-with-comics).
+All code can be found [here](https://github.com/largecats/ocr/tree/master/comics).
 
 ### OCR with Tesseract
 
