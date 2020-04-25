@@ -96,7 +96,7 @@ This is where the executable will be placed.
           "-g",
           "-o",
           "/home/<linux user name>/projects/helloworld/helloworld.out",
-          "'${fileBasename}'"
+          "'{relativeFileDirname}/${fileBasename}'"
         ],
         "group": {
           "kind": "build",
@@ -122,7 +122,7 @@ This is where the executable will be placed.
   }
 ```
 The task `build on WSL` builds the program and creates an executable `helloworld.out`. The task `run on WSL` runs the executable and prints the output in VS Code.
-4. For debugging: In `json`, create a `launch.json` file and paste the following content, replacing `<linux username>` and `<windows username>` with your Linux and Windows usernames, respectively.
+1. For debugging: In `json`, create a `launch.json` file and paste the following content, replacing `<linux username>` and `<windows username>` with your Linux and Windows usernames, respectively.
 ```
 {
   "version": "0.2.0",
