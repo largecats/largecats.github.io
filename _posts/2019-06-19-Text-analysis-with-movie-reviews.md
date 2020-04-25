@@ -21,7 +21,7 @@ I read [this article](https://www.datacamp.com/community/tutorials/text-analytic
 
 ## Method
 
-All code can be found [here](https://github.com/largecats/text-analysis-with-movie-reviews).
+All code can be found [here](https://github.com/largecats/text-analysis/tree/master/movies).
 
 ### Scraping movie reviews
 
