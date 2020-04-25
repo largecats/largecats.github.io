@@ -11,7 +11,7 @@ tags: wsl C/C++ vs-code
 
 ## Motivation
 
-I want to use VS Code to edit C/C++ code on Windows but compile and run executable on WSL. 
+I want to use VS Code to edit C/C++ code on Windows but compile and run executable on WSL through the VS Code UI. Note that this is not necessary. You can simply navigate to `/mnt/c/Users/<path_to_file>`, the path of the source `.c` file on Windows under the WSL file system, do `cc xxx.c` and the `a.out` file would be produced.
 
 ## Preparation
 
