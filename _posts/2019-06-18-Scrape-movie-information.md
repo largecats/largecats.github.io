@@ -21,7 +21,7 @@ I read [this article](https://www.dataquest.io/blog/web-scraping-beautifulsoup/)
 
 ## Method
 
-Douban and IMDb each has a list of top 250 movies. For each movie in Douban/IMDb's list, I collected information of this movie from Douban/IMDb and IMDb/Douban. All code can be found [here](https://github.com/largecats/web-scraping-practice/tree/master/movies). However, kindly note that the code, data files, and graphs were produced in 2017, so some parts of the code may not work with the websites' current configuration.
+Douban and IMDb each has a list of top 250 movies. For each movie in Douban/IMDb's list, I collected information of this movie from Douban/IMDb and IMDb/Douban. All code can be found [here](https://github.com/largecats/web-scraping-practice/tree/master/movie-rating). However, kindly note that the code, data files, and graphs were produced in 2017, so some parts of the code may not work with the websites' current configuration.
 
 ### Collecting data
 
