@@ -318,6 +318,7 @@ If udfs are defined at top-level, they can be imported without errors.
 If udfs need to be put in a class, they should be defined as attributes built from static methods of the class, e.g.,
 ```python
 class Function():
+
     def __init__(self):
         self.foo_udf = F.udf(Function.foo, T.DoubleType())
     
