@@ -311,3 +311,20 @@ Some workarounds include:
 # Do not import / define udfs before creating SparkContext
 
 Spark udfs require `SparkContext` to work. So udfs must be defined or imported after having initialized a `SparkContext`. Otherwise, the Spark job will freeze, see [here](https://stackoverflow.com/questions/35923775/functions-from-custom-module-not-working-in-pyspark-but-they-work-when-inputted).
+
+# Defining udfs in a class
+If udfs are defined at top-level, they can be imported without errors.
+
+If udfs need to be put in a class, they should be defined as attributes built from static methods of the class, e.g.,
+```python
+class Function():
+    def __init__(self):
+        self.foo_udf = F.udf(Function.foo, T.DoubleType())
+    
+    @staticmethod
+    def foo():
+        return .5
+```
+otherwise they may cause serialization errors.
+
+An explanation is that only objects defined at top-level are serializable. These include udfs defined at top-level, attributes of a class defined at top-level, but not methods of that class (see [here](https://stackoverflow.com/questions/58416527/pyspark-user-defined-functions-inside-of-a-class])).
