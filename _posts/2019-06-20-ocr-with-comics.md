@@ -39,13 +39,13 @@ OCR is the conversion of images of text into machine-encoded text. We will use i
  | C:/comics/issue01/page02.jpg | EACH A COG IN THE GREAT MACHINE.                 |
  | ...                          | ...                                              |
 
-All code can be found [here](https://github.com/largecats/ocr/tree/master/comics).
+All code can be found [here](https://github.com/largecats/comics-ocr).
 
 ### OCR with Tesseract
 
 For the above purpose, we will use the OCR engine [Tesseract](https://github.com/tesseract-ocr/tesseract).
 
-1. Download Tesseract from [here](https://github.com/tesseract-ocr/tesseract/wiki).
+1. Download Tesseract from [here](https://github.com/tesseract-ocr/tessdoc/blob/master/Home.md).
 2. Add the path of installation, e.g., `C:\Program Files (x86)\Tesseract-OCR`, to environment variables.
 3. Open cmd and type `tesseract -v`. If the version information shows up, the installation is successful. E.g.,
 
