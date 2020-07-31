@@ -96,7 +96,7 @@ This is where the executable will be placed.
           "-g",
           "-o",
           "/home/<linux user name>/projects/helloworld/helloworld.out",
-          "'{relativeFileDirname}/${fileBasename}'"
+          "'${relativeFileDirname}/${fileBasename}'"
         ],
         "group": {
           "kind": "build",
