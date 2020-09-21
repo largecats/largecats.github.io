@@ -21,7 +21,10 @@ tags: spark YARN Linux-shell
 
 # Motivation   
 
-We want to take advantage of cluster mode in terms of resource while retaining the ability to 
+Spark has 2 deployment modes, client mode and cluster mode. Cluster mode is ideal for batch ETL jobs, but logs in cluster mode are not readily accessible as in client mode since they are generated to the stdout of different machines on the cluster. 
+
+We want to take advantage of cluster mode in terms of resource while retaining the ability to
+
 1. access and store logs for recent as well as historical jobs conveniently, and
 2. view log conveniently in real time.
 
@@ -29,7 +32,7 @@ We want to take advantage of cluster mode in terms of resource while retaining t
 
 # Background   
 
-Spark has 2 deployment modes, client mode and cluster mode. The differences are where the driver program runs (and thus whose resource the driver program uses) and who is responsible for communication with YARN and requesting resource from YARN.
+The differences between client mode and cluster mode are where the driver program runs (and thus whose resource the driver program uses) and who is responsible for communication with YARN and requesting resource from YARN.
 
 **Client mode**   
 
@@ -42,11 +45,13 @@ Spark has 2 deployment modes, client mode and cluster mode. The differences are 
 * driver program runs on the application master and uses the cluster resource
 * application master is responsible for both communication with YARN and requesting resource from YARN
 
-Client mode is suitable for cases (see [here](https://stackoverflow.com/questions/41124428/spark-yarn-cluster-vs-client-how-to-choose-which-one-to-use/41142747)) where
+Client mode is suitable for cases  where
 * jobs are interactive spark-shell, 
 * jobs need to process local data on the driver server (since such data would not be readily available to the driver program in cluster mode).
+
+Cluster mode is suitable for jobs that process large volume of data and require much resource for the driver program (see [here](https://stackoverflow.com/questions/41124428/spark-yarn-cluster-vs-client-how-to-choose-which-one-to-use/41142747)). This is ideal especially for cases where the driver server is becoming the resource bottleneck. But in cluster mode, the logs are not as easily accessible as in client mode where they are visible from the console, and in most cases, we only have YARN's log aggregation to rely on.
   
-Cluster mode is suitable for jobs that process large volume of data and require much resource for the driver program. This is an ideal deploy mode for batch ETL jobs, especially when the driver server is becoming the resource bottleneck. However in cluster mode, logs are not readily accessible as they are in client mode since they are generated to the stdout of different machines on the cluster, and in most cases, we only have YARN's log aggregation to rely on. The following sections explore a number of different workarounds and present a final solution that makes accessing and storing logs easy in cluster mode.
+The following sections explore a number of different workarounds and present a final solution that makes accessing and storing logs easy in cluster mode.
 
 # Approaches   
 
