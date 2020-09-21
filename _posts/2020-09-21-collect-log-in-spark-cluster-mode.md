@@ -51,7 +51,15 @@ Client mode is suitable for cases  where
 
 Cluster mode is suitable for jobs that process large volume of data and require much resource for the driver program (see [here](https://stackoverflow.com/questions/41124428/spark-yarn-cluster-vs-client-how-to-choose-which-one-to-use/41142747)). This is ideal especially for cases where the driver server is becoming the resource bottleneck. But in cluster mode, the logs are not as easily accessible as in client mode where they are visible from the console, and in most cases, we only have YARN's log aggregation to rely on.
   
-The following sections explore a number of different workarounds and present a final solution that makes accessing and storing logs easy in cluster mode.
+The following sections explore a number of different workarounds and present a workable solution (at the end) that makes accessing and storing logs easy in cluster mode.
+
+# Challenges
+In cluster mode, the driver program runs on the cluster, i.e., on a machine other than the "driver server" which submits the application. This poses the following challenges.
+
+1. The driver program log is generated to the stdout of a machine other than the driver server which we have access to;
+2. Interrupting Spark application via Ctrl-C or by marking success/killing tasks in Airflow will only kill the process running on the driver server, not the Spark application itself.
+
+In other words, there is a degree of disconnection between the driver server, which we can access, and the spark application that is submitted to the cluster. The solution that worked effectively builds a bridge to resolve such disconnection.
 
 # Approaches   
 
@@ -59,9 +67,9 @@ The following sections explore a number of different workarounds and present a f
 
 In cluster mode, logs are generated to the stdout stream of machines other than the server that submits the application. Our search did not turn up any method that can write logs to our chosen directory in real time or print it to console: 
 
-* This post https://stackoverflow.com/questions/23058663/where-are-logs-in-spark-on-yarn/26082707#26082707 does not say can
-* This post https://stackoverflow.com/questions/46725949/log4j-not-logging-in-spark-yarn-cluster-mode seems to want to do the same thing as we do, but no solutions are raised
-* This post https://stackoverflow.com/questions/51014377/spark-driver-logs-on-edge-node-in-cluster-mode says cannot
+* [This post](https://stackoverflow.com/questions/23058663/where-are-logs-in-spark-on-yarn/26082707#26082707) does not say can
+* [This post](https://stackoverflow.com/questions/46725949/log4j-not-logging-in-spark-yarn-cluster-mode) seems to want to do the same thing as we do, but no solutions are raised
+* [This post](https://stackoverflow.com/questions/51014377/spark-driver-logs-on-edge-node-in-cluster-mode) says cannot
 
 ## Collect aggregated log after application is finished   
 
