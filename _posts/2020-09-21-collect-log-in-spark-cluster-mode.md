@@ -22,7 +22,7 @@ tags: spark YARN Linux-shell
 # Motivation   
 
 We want to take advantage of cluster mode in terms of resource while retaining the ability to 
-1. access and store logs for recent as well as historical jobs conveniently (this is arguably different from the need of Shopee DE team which uses Spark's history server to store logs), and
+1. access and store logs for recent as well as historical jobs conveniently, and
 2. view log conveniently in real time.
 
 
