@@ -19,14 +19,26 @@ tags: spark YARN Linux-shell
 * content
 {:toc}
 
-# Motivation
+# Motivation   
+
+We want to take advantage of cluster mode in terms of resource while retaining the ability to 
+1. access and store logs for recent as well as historical jobs conveniently (this is arguably different from the need of Shopee DE team which uses Spark's history server to store logs), and
+2. view log conveniently in real time.
+
+
+
+# Background   
 
 Spark has 2 deployment modes, client mode and cluster mode. The differences are where the driver program runs (and thus whose resource the driver program uses) and who is responsible for communication with YARN and requesting resource from YARN.
 
-**Client mode**
+**Client mode**   
+
 * driver program runs on driver server (i.e., the server that launches the spark-submit program) and uses its resource
 * driver program is responsible for communication with YARN (it commands application master to request resource from YARN)
-**Cluster mode**
+
+
+**Cluster mode**   
+
 * driver program runs on the application master and uses the cluster resource
 * application master is responsible for both communication with YARN and requesting resource from YARN
 
@@ -36,15 +48,9 @@ Client mode is suitable for cases (see [here](https://stackoverflow.com/question
   
 Cluster mode is suitable for jobs that process large volume of data and require much resource for the driver program. This is an ideal deploy mode for batch ETL jobs, especially when the driver server is becoming the resource bottleneck. However in cluster mode, logs are not readily accessible as they are in client mode since they are generated to the stdout of different machines on the cluster, and in most cases, we only have YARN's log aggregation to rely on. The following sections explore a number of different workarounds and present a final solution that makes accessing and storing logs easy in cluster mode.
 
-# Objective
+# Approaches   
 
-We want to take advantage of cluster mode in terms of resource while retaining the ability to 
-1. access and store logs for recent as well as historical jobs conveniently (this is arguably different from the need of Shopee DE team which uses Spark's history server to store logs), and
-2. view log conveniently in real time.
-
-# Approaches
-
-## Redirect log to console in real time
+## Redirect log to console in real time   
 
 In cluster mode, logs are generated to the stdout stream of machines other than the server that submits the application. Our search did not turn up any method that can write logs to our chosen directory in real time or print it to console: 
 
@@ -52,7 +58,7 @@ In cluster mode, logs are generated to the stdout stream of machines other than 
 * This post https://stackoverflow.com/questions/46725949/log4j-not-logging-in-spark-yarn-cluster-mode seems to want to do the same thing as we do, but no solutions are raised
 * This post https://stackoverflow.com/questions/51014377/spark-driver-logs-on-edge-node-in-cluster-mode says cannot
 
-## Collect aggregated log after application is finished
+## Collect aggregated log after application is finished   
 
 Instead, we want to collect the aggregated logs to a designated directory using the `yarn logs -applicationId $applicationId` command after the spark application is finished. E.g., to collect log in HDFS:
 ```
@@ -71,7 +77,7 @@ This approach means we need to consider two things:
 
 The applicationId is conveniently available via spark.sparkContext.applicationId in the .py script after creating a spark session, but the flow control is more conveniently done in shell script where we have a clear idea of when the spark-submit process terminates. We can put the log collection command in either the .py script or the shell script, with the understanding that either approach has trade-off.
 
-### In .py script: Use customized sys.excepthook to trigger log collection upon any exception (X)
+### In .py script: Use customized sys.excepthook to trigger log collection upon any exception (X)   
 
 In .py script, the applicationId can be easily accessed via spark.sparkContext.applicationId. But to put the log collection command in .py script, we need to make sure that any event that triggers program termination, be it normal termination or exception, is caught and redirected to log collection. E.g., we could wrap a try...except block around the main entry point of the driver script in the pipeline. Yet this does not capture errors in the definition of the pipeline itself, or our customized common modules that are imported by the driver script. Instead, we considered using a customized sys.excepthook to catch exceptions globally.
 
@@ -102,7 +108,7 @@ sys.excepthook = except_hook(applicationId, logPath, logger) # define customized
 ```
 This approach, however, is flawed in that the definition of our customized excepthook requires a running spark session, which only exists in the config scripts of each data model, and not in the common modules. Other drawbacks include the need to carefully manage the order of imported modules, e.g., the customized excepthook should be defined before other objects in the driver script, or some errors may be missed and the log collection step wouldn't be triggered.
 
-### In shell script: Parse client process' output to get applicationId and trigger log collection after spark-submit is finished
+### In shell script: Parse client process' output to get applicationId and trigger log collection after spark-submit is finished   
 
 Another approach we considered and ended up adopting is to trigger log collection in shell script after the spark-submit process is finished. This has the advantage of providing a clear indication when the spark-submit process terminates. The trade-off, though, is that instead of getting the applicationId conveniently from the spark session, we need to parse the spark-submit process' output and extract the applicationId.
 
@@ -114,7 +120,7 @@ After some digging, we found that in cluster mode, the spark-submit command is l
 
 #### Implementation
 
-**Print client process log to console**
+**Print client process log to console**   
 
 1. Add a log4j.properties file as follows. AS shown above, the applicationId in the client process' log is INFO level. So we need to set log4j.logger.Client  to INFO  level.
 ```
@@ -136,8 +142,9 @@ spark-submit --verbose \
 /home/xxx/main.py $param
 ```
 
-**Parse client process log to get applicationId**
-1. Launch the client process via `run()`.
+**Parse client process log to get applicationId**   
+
+1. Launch the client process via `run`.
 2. Set trap for the interruption signals SIGINT, SIGTERM to kill the application upon receiving these signals.
    1. Again, because spark applications in cluster mode run on the cluster, they will not receive any termination signal sent via the driver server. This means Ctrl-C (SIGINT), marking success or killing in Airflow (SIGTERM) would only kill the client process, but not the spark application itself. Instead, we need to explicitly invoke the yarn application -kill $applicationId  command upon receiving the termination signals.
 3. Read the client process' log line by line until reaching the line containing the applicationId. Extract the applicationId.
@@ -238,7 +245,8 @@ get_application_status() {
 
 ```
 
-**Collect YARN aggregated logs to designated directory upon job completion**
+**Collect YARN aggregated logs to designated directory upon job completion**   
+
 Use the extracted applicationId to collect logs to designated directory after the application is finished.
 ```
 #!/bin/bash
