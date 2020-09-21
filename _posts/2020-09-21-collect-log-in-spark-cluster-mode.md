@@ -148,6 +148,7 @@ spark-submit --verbose \
 2. Set trap for the interruption signals SIGINT, SIGTERM to kill the application upon receiving these signals.
    1. Again, because spark applications in cluster mode run on the cluster, they will not receive any termination signal sent via the driver server. This means Ctrl-C (SIGINT), marking success or killing in Airflow (SIGTERM) would only kill the client process, but not the spark application itself. Instead, we need to explicitly invoke the yarn application -kill $applicationId  command upon receiving the termination signals.
 3. Read the client process' log line by line until reaching the line containing the applicationId. Extract the applicationId.
+
 ```
 #!/bin/bash
 
@@ -211,7 +212,9 @@ sparkSubmitExit=$?
 ...
 
 ```
+
 where `shell_functions.sh` include:
+
 ```
 
 #!/bin/bash
@@ -248,6 +251,7 @@ get_application_status() {
 **Collect YARN aggregated logs to designated directory upon job completion**   
 
 Use the extracted applicationId to collect logs to designated directory after the application is finished.
+
 ```
 #!/bin/bash
 
@@ -262,7 +266,9 @@ collectLogExit=$?
 finalExit=$(($trapExit+$sparkSubmitExit+$collectLogExit))
 exit_with_code $finalExit
 ```
+
 where `shell_functions.sh` include:
+
 ```
 
 #!/bin/bash
