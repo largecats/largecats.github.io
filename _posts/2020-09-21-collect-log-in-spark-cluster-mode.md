@@ -62,7 +62,6 @@ In cluster mode, the driver program runs on the cluster, i.e., on a machine othe
 In other words, there is a degree of disconnection between the driver server, which we can access, and the spark application that is submitted to the cluster. The solution that worked effectively builds a bridge to resolve such disconnection.
 
 # Approaches   
-
 ## Redirect log to console in real time   
 
 In cluster mode, logs are generated to the stdout stream of machines other than the server that submits the application. Our search did not turn up any method that can write logs to our chosen directory in real time or print it to console: 
@@ -132,7 +131,6 @@ After some digging, we found that in cluster mode, the spark-submit command is l
 [pic TBD]
 
 #### Implementation
-
 **Print client process log to console**   
 
 1. Add a log4j.properties file as follows. AS shown above, the applicationId in the client process' log is INFO level. So we need to set log4j.logger.Client  to INFO  level.
