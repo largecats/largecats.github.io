@@ -30,7 +30,7 @@ Spark has 2 deploy modes, client mode and cluster mode. Cluster mode is ideal fo
 <div align="center">
 </div>
 
-We want to make use of cluster mode's advantage in terms of resource and find workarounds to:
+We want to make use of cluster mode's advantage and find workarounds to:
 
 1. Access and store logs for recent as well as historical jobs conveniently;
 2. View log conveniently in real time;
