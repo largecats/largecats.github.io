@@ -26,7 +26,7 @@ Spark has 2 deployment modes, client mode and cluster mode. Cluster mode is idea
 1. We can't access the driver program's log from the driver server (only the client process' log is available to the driver server).
 2. We can't terminate the spark application via Ctrl-C or by marking success/killing tasks in the Airflow scheduler (doing so will only kill the client process running on the driver server, not the spark application itself).
 
-<div style="text-align: center"><img src="/images/cluster_mode-Page-1.png" width="600px" /></div>
+<div style="text-align: center"><img src="/images/cluster_mode-Page-1.png" width="800px" /></div>
 <div align="center">
 </div>
 
@@ -108,14 +108,14 @@ A naiive approach would be to print the applicationId from the spark session to 
 
 After some digging, we found that in cluster mode, the spark-submit command is launched by a client process, which starts on the driver server and exits as soon as it fulfills its responsibility of submitting the application to the cluster without waiting for the application to finish. The log of this client process contains the applicationId, and this log - because the client process is run by the driver server - can be printed to the driver server's console. In other words, this is the only place where the shell script can access the spark job's applicationId.
 
-<div style="text-align: center"><img src="/images/client_process_log.png" width="600px" /></div>
+<div style="text-align: center"><img src="/images/client_process_log.png" width="800px" /></div>
 <div align="center">
 <sup>Client process log containing the applicationId.</sup>
 </div>
 
 #### Implementation
 
-<div style="text-align: center"><img src="/images/cluster_mode-Page-2.png" width="600px" /></div>
+<div style="text-align: center"><img src="/images/cluster_mode-Page-2.png" width="800px" /></div>
 <div align="center">
 </div>
 
