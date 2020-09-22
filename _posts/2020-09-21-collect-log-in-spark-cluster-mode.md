@@ -106,7 +106,7 @@ Another approach we considered and ended up adopting is to trigger log collectio
 
 A naiive approach would be to print the applicationId from the spark session to pass it to the shell script. But the only way to do so is by printing the applicationId, and in cluster mode, this would go to the stdout of another machine in the cluster, which we cannot access from the driver server.
 
-After some digging, we found that in cluster mode, the spark-submit command is launched by a client process, which starts on the driver server and exits as soon as it fulfills its responsibility of submitting the application to the cluster without waiting for the application to finish. The log of this client process contains the applicationId, and this log - because the client process is run by the driver server - can be printed to the driver server's console. In other words, this is the only place where the shell script can access the spark job's applicationId.
+After some digging, we found anoter way to get the applicationId. In cluster mode, the spark-submit command is launched by a client process, which runs entirely on the driver server. The log of this client process contains the applicationId, and this log - because the client process is run by the driver server - can be printed to the driver server's console. In other words, this is the only place where the shell script can access the spark job's applicationId.
 
 <div style="text-align: center"><img src="/images/client_process_log.png" width="800px" /></div>
 <div align="center">
