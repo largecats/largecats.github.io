@@ -7,7 +7,7 @@
 
 # Site settings
 title: largecats' blog
-brief-intro: aspiring data engineer
+brief-intro: data engineer
 baseurl: "" # the subpath of your site, e.g. /blog
 url: "https://largecats.github.io" # the base hostname & protocol for your site
 
