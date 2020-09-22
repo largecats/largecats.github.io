@@ -1,0 +1,17 @@
+I"Y<ul id="markdown-toc">
+  <li><a href="#problem" id="markdown-toc-problem">Problem</a></li>
+  <li><a href="#solution" id="markdown-toc-solution">Solution</a></li>
+</ul>
+
+<p>This post refers to <a href="https://largecats.github.io/2019/06/17/Build-blog/">how this particular blog site is configured</a>.</p>
+
+<h2 id="problem">Problem</h2>
+
+<p>The main page of my blog site displayed the entire length of each of my blog post. I wanted to display an excerpt of each blog post instead.</p>
+
+<h2 id="solution">Solution</h2>
+
+<p>I realized that this was because I separated all my paragraphs using one blank line, when I should use at least three. The reason is as follows.</p>
+
+<p>In the file <code class="language-plaintext highlighter-rouge">index.html</code>, the code <code class="language-plaintext highlighter-rouge">&lt;div class="excerpt"&gt;&lt;/div&gt;</code> specifies that the main page displays an excerpt of each blog post. This excerpt is defaulted to the first paragraph of a blog post, which in turn is defined as a block of text separated from the second paragraph by at least three blank lines.</p>
+:ET

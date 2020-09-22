@@ -1,0 +1,417 @@
+I"kb<head>
+    <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script>
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({
+            tex2jax: {
+            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+            inlineMath: [['$','$']]
+            }
+        });
+    </script>
+</head>
+<ul id="markdown-toc">
+  <li><a href="#motivation" id="markdown-toc-motivation">Motivation</a></li>
+  <li><a href="#approaches" id="markdown-toc-approaches">Approaches</a>    <ul>
+      <li><a href="#redirect-log-to-console-in-real-time" id="markdown-toc-redirect-log-to-console-in-real-time">Redirect log to console in real time</a></li>
+      <li><a href="#collect-aggregated-log-after-application-is-finished" id="markdown-toc-collect-aggregated-log-after-application-is-finished">Collect aggregated log after application is finished</a>        <ul>
+          <li><a href="#in-py-script-use-customized-sysexcepthook-to-trigger-log-collection-upon-any-exception-x" id="markdown-toc-in-py-script-use-customized-sysexcepthook-to-trigger-log-collection-upon-any-exception-x">In .py script: Use customized sys.excepthook to trigger log collection upon any exception (X)</a></li>
+          <li><a href="#in-shell-script-parse-client-process-output-to-get-applicationid-and-trigger-log-collection-after-spark-submit-is-finished" id="markdown-toc-in-shell-script-parse-client-process-output-to-get-applicationid-and-trigger-log-collection-after-spark-submit-is-finished">In shell script: Parse client process’ output to get applicationId and trigger log collection after spark-submit is finished</a>            <ul>
+              <li><a href="#implementation" id="markdown-toc-implementation">Implementation</a></li>
+              <li><a href="#workflow" id="markdown-toc-workflow">Workflow</a></li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
+
+<h1 id="motivation">Motivation</h1>
+
+<p>Spark has 2 deployment modes, client mode and cluster mode. Cluster mode is ideal for batch ETL jobs submitted via the same “driver server” because the driver programs are run on the cluster instead of the driver server, thereby preventing the driver server from becoming the resource bottleneck. But in cluster mode, the driver server is only responsible for running a client process that submits the application, and the driver program is run on another machine in the cluster. This poses the following challenges:</p>
+
+<ol>
+  <li>We can’t access the driver program’s log from the driver server (only the client process’ log is available to the driver server).</li>
+  <li>We can’t terminate the spark application via Ctrl-C or by marking success/killing tasks in the Airflow scheduler (doing so will only kill the client process running on the driver server, not the spark application itself).</li>
+</ol>
+
+<div style="text-align: center"><img src="/images/cluster_mode-Page-1.png" width="600px" /></div>
+<div align="center">
+</div>
+
+<p>We want to make use of cluster mode’s advantage in terms of resource and find workarounds to:</p>
+
+<ol>
+  <li>Access and store logs for recent as well as historical jobs conveniently;</li>
+  <li>View log conveniently in real time;</li>
+  <li>Kill applications via keyboard or Airflow.</li>
+</ol>
+
+<h1 id="approaches">Approaches</h1>
+<h2 id="redirect-log-to-console-in-real-time">Redirect log to console in real time</h2>
+
+<p>A naiive approach is to attempt to to mimic the conveniences of client mode. Our search did not turn up any method that can redirect aggregated logs to our chosen directory in real time or print it to console.</p>
+
+<ul>
+  <li><a href="https://stackoverflow.com/questions/23058663/where-are-logs-in-spark-on-yarn/26082707#26082707">This post</a> does not say can.</li>
+  <li><a href="https://stackoverflow.com/questions/46725949/log4j-not-logging-in-spark-yarn-cluster-mode">This post</a> seems to want to do the same thing as we do, but no solutions are raised.</li>
+  <li><a href="https://stackoverflow.com/questions/51014377/spark-driver-logs-on-edge-node-in-cluster-mode">This post</a> says cannot.</li>
+</ul>
+
+<h2 id="collect-aggregated-log-after-application-is-finished">Collect aggregated log after application is finished</h2>
+
+<p>Instead, a more practical approach is to:</p>
+
+<ol>
+  <li>Collect the aggregated logs to a designated directory using the <code class="language-plaintext highlighter-rouge">yarn logs -applicationId $applicationId</code> command after the spark application is finished. E.g., to collect log in HDFS:
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>yarn logs -applicationId $applicationId -log_files stdout -am 1 | hadoop fs -appendToFile - /user/xxx/log_--dates_2020-09-21.txt
+</code></pre></div>    </div>
+    <p>or in the driver server’s local file system:</p>
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>yarn logs -applicationId $applicationId -log_files stdout -am 1 |&amp; tee -a /home/xxx/log_--dates_2020-09-21.txt
+</code></pre></div>    </div>
+  </li>
+  <li>View log in real-time using the <code class="language-plaintext highlighter-rouge">watch</code> and <code class="language-plaintext highlighter-rouge">tail</code> commands or YARN’s UI.</li>
+  <li>Use <code class="language-plaintext highlighter-rouge">yarn application -kill $applicationId</code> to kill the spark application upon receiving termination signals from keyboard or Airflow.</li>
+</ol>
+
+<p>To implement this approach, we need to consider the following:</p>
+
+<ol>
+  <li>ApplicationId: How to get the applicationId that we need to collect aggregate logs from YARN and relay termination signals to the driver program;</li>
+  <li>Flow control: How to make sure that log collection is triggered only after the application is finished (either exiting normally or terminating upon error), so that the log is complete.</li>
+</ol>
+
+<p>The applicationId is conveniently available via <code class="language-plaintext highlighter-rouge">spark.sparkContext.applicationId</code> in the .py script after creating a spark session, but the flow control is more conveniently done in shell script where we have a clear idea of when the spark-submit process terminates. We can put the log collection command in either the .py script or the shell script, with the understanding that either approach has trade-off.</p>
+
+<h3 id="in-py-script-use-customized-sysexcepthook-to-trigger-log-collection-upon-any-exception-x">In .py script: Use customized sys.excepthook to trigger log collection upon any exception (X)</h3>
+
+<p>In .py script, the applicationId can be easily accessed via <code class="language-plaintext highlighter-rouge">spark.sparkContext.applicationId</code>. But to put the log collection command in .py script, we need to make sure that any event that triggers program termination, be it normal termination or exception, is caught and redirected to log collection. E.g., we could wrap a <code class="language-plaintext highlighter-rouge">try...except</code> block around the main entry point of the driver script in the pipeline. Yet this does not capture errors in the definition of the pipeline itself, or our customized common modules that are imported by the driver script. Instead, we considered using a customized sys.excepthook to catch exceptions globally.</p>
+
+<p>A customized excepthook is a function with 3 arguments <code class="language-plaintext highlighter-rouge">type, value, tback</code> and performs customized handling of the caught exception. In the example below, <code class="language-plaintext highlighter-rouge">except_hook</code>  returns a customized excepthook which, upon catching any exception, collects log using the applicationId supplied and calls the default handler <code class="language-plaintext highlighter-rouge">sys.__excepthook__()</code> to handle the exception.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">collect_log</span><span class="p">(</span><span class="n">applicationId</span><span class="p">,</span> <span class="n">logPath</span><span class="p">,</span> <span class="n">logger</span><span class="p">):</span>
+    <span class="n">cmd</span> <span class="o">=</span> <span class="s">'yarn logs -applicationId {application_id} -am 1 |&amp; tee -a $logPath'</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span>
+            <span class="n">application_id</span><span class="o">=</span><span class="n">applicationId</span><span class="p">,</span> <span class="n">logPath</span><span class="o">=</span><span class="n">logPath</span><span class="p">)</span>
+    <span class="n">logger</span><span class="p">.</span><span class="n">info</span><span class="p">(</span><span class="s">'Collecting log to '</span> <span class="o">+</span> <span class="n">logPath</span><span class="p">)</span>
+    <span class="n">logger</span><span class="p">.</span><span class="n">info</span><span class="p">(</span><span class="n">cmd</span><span class="p">)</span>
+    <span class="n">subprocess</span><span class="p">.</span><span class="n">call</span><span class="p">(</span><span class="n">cmd</span><span class="p">,</span> <span class="n">shell</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="k">return</span> <span class="bp">True</span>
+
+<span class="k">def</span> <span class="nf">except_hook</span><span class="p">(</span><span class="n">applicationId</span><span class="p">,</span> <span class="n">logPath</span><span class="p">,</span> <span class="n">logger</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">handler</span><span class="p">(</span><span class="nb">type</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">tback</span><span class="p">):</span>
+        <span class="n">exc_info</span> <span class="o">=</span> <span class="n">sys</span><span class="p">.</span><span class="n">exc_info</span><span class="p">()</span>
+        <span class="c1"># Display the *original* exception
+</span>        <span class="n">traceback</span><span class="p">.</span><span class="n">print_exception</span><span class="p">(</span><span class="o">*</span><span class="n">exc_info</span><span class="p">)</span>
+        <span class="k">del</span> <span class="n">exc_info</span>
+        <span class="n">collect_log</span><span class="p">(</span><span class="n">applicationId</span><span class="p">,</span> <span class="n">logPath</span><span class="p">,</span> <span class="n">logger</span><span class="p">)</span>
+        <span class="n">sys</span><span class="p">.</span><span class="n">__excepthook__</span><span class="p">(</span><span class="nb">type</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">tback</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">handler</span>
+
+<span class="p">...</span>
+
+<span class="n">sys</span><span class="p">.</span><span class="n">excepthook</span> <span class="o">=</span> <span class="n">except_hook</span><span class="p">(</span><span class="n">applicationId</span><span class="p">,</span> <span class="n">logPath</span><span class="p">,</span> <span class="n">logger</span><span class="p">)</span> <span class="c1"># define customized excepthook
+</span></code></pre></div></div>
+<p>This approach, however, is flawed in that the definition of our customized excepthook requires a running spark session, which only exists in the config scripts of each data model, and not in the common modules. Other drawbacks include the need to carefully manage the order of imported modules, e.g., the customized excepthook should be defined before other objects in the driver script, or some errors may be missed and the log collection step wouldn’t be triggered.</p>
+
+<h3 id="in-shell-script-parse-client-process-output-to-get-applicationid-and-trigger-log-collection-after-spark-submit-is-finished">In shell script: Parse client process’ output to get applicationId and trigger log collection after spark-submit is finished</h3>
+
+<p>Another approach we considered and ended up adopting is to trigger log collection in shell script after the spark-submit process is finished. This has the advantage of providing a clear indication when the spark-submit process terminates. The trade-off, though, is that instead of getting the applicationId conveniently from the spark session, we need to parse the spark-submit process’ output and extract the applicationId.</p>
+
+<p>A naiive approach would be to print the applicationId from the spark session to pass it to the shell script. But the only way to do so is by printing the applicationId, and in cluster mode, this would go to the stdout of another machine in the cluster, which we cannot access from the driver server.</p>
+
+<p>After some digging, we found that in cluster mode, the spark-submit command is launched by a client process, which starts on the driver server and exits as soon as it fulfills its responsibility of submitting the application to the cluster without waiting for the application to finish. The log of this client process contains the applicationId, and this log - because the client process is run by the driver server - can be printed to the driver server’s console. In other words, this is the only place where the shell script can access the spark job’s applicationId.</p>
+
+<div style="text-align: center"><img src="/images/client_process_log.png" width="600px" /></div>
+<div align="center">
+<sup>Client process log containing the applicationId.</sup>
+</div>
+
+<h4 id="implementation">Implementation</h4>
+
+<div style="text-align: center"><img src="/images/cluster_mode-Page-2.png" width="600px" /></div>
+<div align="center">
+</div>
+
+<p><strong>Print client process log to console</strong></p>
+
+<ol>
+  <li>Add a log4j.properties file as follows. AS shown above, the applicationId in the client process’ log is INFO level. So we need to set log4j.logger.Client  to INFO  level.
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>log4j.rootLogger=INFO, stdout, stderr
+log4j.logger.Client = INFO, stdout, stderr
+</code></pre></div>    </div>
+  </li>
+  <li>Pass the above log4j.properties file to the <code class="language-plaintext highlighter-rouge">SPARK_SUBMIT_OPTS</code> of the driver server that runs the client process. This gets the client process’ log to be printed to the driver server’s console.
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>SPARK_SUBMIT_OPTS="-Dlog4j.debug=true -Dlog4j.configuration=file:///home/xxx/config/log4j.properties" \
+python spark_submit.py \
+spark-submit --verbose \
+--deploy-mode cluster \
+--master yarn \
+--name "My Spark Application $param" \
+--conf spark.executor.memoryOverhead=5G \
+--conf spark.yarn.maxAppAttempts=1 \
+--num-executors 10 \
+--py-files /home/xxx/lib.zip,/home/xxx/config.py \ # need to include all files, otherwise the driver program won't be able to find them from the cluster
+/home/xxx/main.py $param
+</code></pre></div>    </div>
+  </li>
+</ol>
+
+<p><strong>Parse client process log to get applicationId</strong></p>
+
+<ol>
+  <li>Launch the client process via <code class="language-plaintext highlighter-rouge">run</code>.</li>
+  <li>Set trap for the interruption signals SIGINT, SIGTERM to kill the application upon receiving termination signals SIGINT (Ctrl-C) and SIGTERM (Airflow mark success/kill).</li>
+  <li>Read the client process’ log line by line to extract the applicationId.</li>
+</ol>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>#!/bin/bash
+
+# constants
+HDFS_DIR="/user/xxx"
+DIR="/home/xxx"
+NAME="my_spark_application"
+
+# helper functions
+source "$DIR/shell_functions.sh"
+
+# directory to store logs
+LOG_PATH="$DIR/logs/$NAME"
+mkdir -p $LOG_PATH
+
+run() {
+    SPARK_SUBMIT_OPTS="-Dlog4j.debug=true -Dlog4j.configuration=file:///home/xxx/config/log4j.properties" \
+    python spark_submit.py \
+    spark-submit --verbose \
+    --deploy-mode cluster \
+    --master yarn \
+    --name "My Spark Application $param" \
+    --conf spark.executor.memoryOverhead=5G \
+    --conf spark.yarn.maxAppAttempts=1 \
+    --num-executors 10 \
+    --py-files /home/xxx/lib.zip,/home/xxx/config.py \ # need to include all files, otherwise the driver program won't be able to find them from the cluster
+    /home/xxx/main.py $param
+}
+
+# construct name of log file from parameters
+param=${@}
+logFileName=$NAME
+for arg in ${param[@]}
+    do
+        if [[ ! $arg =~ "$HDFS_DIR" ]]
+        then
+            logFileName+="_$arg"
+        else
+            logFileName+="_${arg//\//-}" # change / to - in path so that the path can appear in the name of the log file
+        fi
+    done
+
+APPLICATION_ID=""
+
+# prepare to kill application via YARN upon receiving SIGINT (Ctrl-C), SIGTERM (Airflow) signals
+trap 'kill_app $APPLICATION_ID' SIGINT SIGTERM # use single quotes to delay variable expansion till when the function is called
+trapExit=$?
+
+# read output of run() line by line to find applicationId
+while read -r line; do
+    echo "$line"
+    if [[ $line =~ "Submitting application application_" ]]
+    then
+        APPLICATION_ID=$(echo $line | grep -oP "application_[0-9_]*") # extract applicationId
+        echo "Found applicationId: $APPLICATION_ID, continue running..."
+    fi
+done &lt; &lt;(run 2&gt;&amp;1)
+get_application_status $APPLICATION_ID
+sparkSubmitExit=$?
+
+...
+
+</code></pre></div></div>
+
+<p>where <code class="language-plaintext highlighter-rouge">shell_functions.sh</code> include:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+#!/bin/bash
+
+kill_app() {
+    echo "Interrupted by keyboard."
+    applicationId=$1
+    if [ $applicationId != "" ]
+    then
+        yarn application -kill $applicationId
+        return 1 # still need to collect log, cannot exit yet
+    else
+        echo "Application not yet submitted. Skipping kill via YARN..."
+        exit_with_code 1 # no need to collect log, can directly exit
+    fi
+}
+
+get_application_status() {
+    applicationId=$1
+    status=$(yarn application -status $applicationId 2&gt;&amp;1)
+    echo "$status"
+    if [[ "${status}" =~ "Final-State : SUCCEEDED" ]]
+    then
+        return 0
+    else
+        return 1
+    fi
+}
+
+...
+
+</code></pre></div></div>
+
+<p><strong>Collect YARN aggregated logs to designated directory upon job completion</strong></p>
+
+<p>Use the extracted applicationId to collect logs to designated directory after the application is finished.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>#!/bin/bash
+
+...
+
+# collect aggregated logs to designated directory
+sleep 5
+collect_log "$APPLICATION_ID" "$LOG_PATH/$logFileName.txt" 10 3
+collectLogExit=$?
+
+# exiting
+finalExit=$(($trapExit+$sparkSubmitExit+$collectLogExit))
+exit_with_code $finalExit
+</code></pre></div></div>
+
+<p>where <code class="language-plaintext highlighter-rouge">shell_functions.sh</code> include:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+#!/bin/bash
+
+...
+
+collect_log_helper() {
+    applicationId=$1
+    logPath=$2
+
+    echo "Collecting log..."
+    output=$(yarn logs -applicationId $applicationId -log_files stdout stderr -am 1 2&gt;&amp;1)
+    status=$(yarn application -status $applicationId 2&gt;&amp;1)
+    if [[ "$output" =~ "Can not find" ]] || [[ "$output" =~ "Unable to get" ]] || [[ "$output" =~ "does not exist" ]] # log aggregation not ready yet
+    then
+        echo "$output"
+        if [[ ! "$status" =~ "Log Aggregation Status : SUCCEEDED" ]]
+        then
+            echo "$status"
+            if [[ "$status" =~ "Log Aggregation Status : NOT_START" ]] || [[ "$status" =~ "Log Aggregation Status : N/A" ]]
+            then
+                echo "Log aggregation not started. Skipping log collection..." # usually because log is not generated, e.g., application was killed before it started runnning
+                return 0
+            elif [[ "$status" =~ "Log Aggregation Status : DISABLED" ]]
+            then
+                echo "Log aggregation disabled. Skipping log collection..."
+                return 0
+            else
+                echo "Log aggregation incomplete. Waiting for retry..."
+                return 1
+            fi
+        else
+            return 1
+        fi
+    else
+        # echo "yarn logs -applicationId $applicationId -log_files stdout stderr -am 1 | hadoop fs -appendToFile - $logPath"
+        # yarn logs -applicationId $applicationId -log_files stdout stderr -am 1 | hadoop fs -appendToFile - $logPath
+        echo "yarn logs -applicationId $applicationId -log_files stdout stderr -am 1 |&amp; tee -a $logPath"
+        (yarn logs -applicationId $applicationId -log_files stdout stderr -am 1 |&amp; tee -a $logPath) &gt;/dev/null
+        statuses=( "${PIPESTATUS[@]}" ) # copy PIPESTATUS to array statuses
+        yarnCmdStatus=${statuses[$(( ${#statuses[@]} - 2 ))]}
+        hadoopCmdStatus=${statuses[$(( ${#statuses[@]} - 1 ))]}
+        if [ ${yarnCmdStatus} -eq 0 ] &amp;&amp; [ ${hadoopCmdStatus} -eq 0 ]
+        then
+            return 0
+        else
+            return 1
+        fi
+    fi
+}
+
+collect_log() {
+    applicationId=$1
+    if [ $applicationId != "" ]
+    then
+        logPath=$2
+        retryInterval=$3
+        maxRetryNo=$4
+        collect_log_helper $applicationId $logPath
+        RET=$?
+        while [[ ${RET} -ne 0 &amp;&amp; ${maxRetryNo} -gt 0 ]]; do
+            echo "Log collection failed, retrying in $retryInterval seconds..."
+            sleep $retryInterval
+            collect_log_helper $applicationId $logPath
+            RET=$?
+            maxRetryNo=$((maxRetryNo-1))
+        done
+        if [ ${maxRetryNo} -eq 0 ]
+        then
+            echo "Maximum number of retries reached. Aborting log collection..."
+            return 1
+        else
+            return $RET
+        fi
+    else
+        echo "No applicationId. Skipping log collection..." # technically this won't happen
+        return 0
+    fi
+}
+
+
+exit_with_code() {
+    exitCode=$1
+    echo "Exiting with code $exitCode."
+    exit ${exitCode}
+}
+</code></pre></div></div>
+
+<h4 id="workflow">Workflow</h4>
+<p><a href="https://hadoop.apache.org/docs/current/hadoop-yarn/hadoop-yarn-site/YarnCommands.html#application">YARN’s spark application statuses</a> are:</p>
+
+<div style="text-align: center"><img src="/images/spark_application_statuses.png" width="800px" /></div>
+<div align="center">
+</div>
+
+<p><a href="http://hadoop.apache.org/docs/r3.1.0/hadoop-yarn/hadoop-yarn-api/apidocs/org/apache/hadoop/yarn/api/records/LogAggregationStatus.html">YARN’s log aggregation statuses</a> are:</p>
+
+<div style="text-align: center"><img src="/images/yarn_log_aggregation_statuses.png" width="600px" /></div>
+<div align="center">
+</div>
+
+<p>When the spark application terminates normally or upon exception, <code class="language-plaintext highlighter-rouge">collect_log</code> will be triggered to copy the logs aggregated by YARN to a designated directory.</p>
+
+<p>What to do when the spark application is killed, on the other hand, requires extra handling.</p>
+
+<p>If the job is killed before reaching SUBMITTED status</p>
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">kill_app</code> won’t be invoked as the spark application is not yet launched;</li>
+  <li><code class="language-plaintext highlighter-rouge">collect_log</code> won’t be triggered as no log is generated.</li>
+</ul>
+
+<div style="text-align: center"><img src="/images/spark_application_kill_before_submitted.png" width="800px" /></div>
+<div align="center">
+</div>
+
+<p>If the job is killed in or after SUBMITTED status but before reaching RUNNING status</p>
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">kill_app</code> will be invoked to kill the application before eventually exiting from the client process;</li>
+  <li><code class="language-plaintext highlighter-rouge">collect_log</code> won’t be triggered as no log is generated.</li>
+</ul>
+
+<div style="text-align: center"><img src="/images/spark_application_kill_before_running.png" width="800px" /></div>
+<div align="center">
+</div>
+
+<p>If the job is killed after RUNNING status</p>
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">kill_app</code> will be invoked to kill the application before eventually exiting from the client process;</li>
+  <li><code class="language-plaintext highlighter-rouge">collect_log</code> will be triggered to collect the YARN aggregated logs after the application is killed.</li>
+</ul>
+
+<div style="text-align: center"><img src="/images/spark_application_kill_after_running.png" width="800px" /></div>
+<div align="center">
+</div>
+:ET

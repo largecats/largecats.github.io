@@ -1,0 +1,41 @@
+I"�<ul id="markdown-toc">
+  <li><a href="#motivation" id="markdown-toc-motivation">Motivation</a></li>
+  <li><a href="#preparation" id="markdown-toc-preparation">Preparation</a></li>
+  <li><a href="#method" id="markdown-toc-method">Method</a></li>
+  <li><a href="#result" id="markdown-toc-result">Result</a></li>
+</ul>
+
+<h2 id="motivation">Motivation</h2>
+
+<p>I want to install Spark on my PC.</p>
+
+<h2 id="preparation">Preparation</h2>
+
+<p>I read chapter 2 of O’Reilly’s <a href="https://www.oreilly.com/library/view/learning-spark/9781449359034/">Learning Spark</a>.</p>
+
+<h2 id="method">Method</h2>
+
+<ol>
+  <li>
+    <p>Download Java from <a href="https://java.com/en/download/win10.jsp">here</a> and install it to a directory with no spaces in the path, e.g., <code class="language-plaintext highlighter-rouge">C:\Java</code>.</p>
+
+    <p>If the directory contains space, the Spark shell may fail with an error described <a href="https://stackoverflow.com/questions/44027151/why-does-spark-shell-fail-with-was-unexpected-at-this-time">here</a>.</p>
+  </li>
+  <li>Create system variable <code class="language-plaintext highlighter-rouge">JAVA_HOME</code> and set it to the path in which Java is just installed.</li>
+  <li>Download Spark from <a href="http://spark.apache.org/downloads.html">here</a> and unzip it to a directory with no spaces in the path, e.g., <code class="language-plaintext highlighter-rouge">C:\Spark</code>.</li>
+  <li>Add the <code class="language-plaintext highlighter-rouge">bin</code> folder in the Spark installation to environment variables.</li>
+  <li>Open <code class="language-plaintext highlighter-rouge">cmd</code> and type <code class="language-plaintext highlighter-rouge">pyspark</code> to open the Python version of Spark shell or type <code class="language-plaintext highlighter-rouge">spark-shell</code> to open the Scala version.</li>
+</ol>
+
+<h2 id="result">Result</h2>
+
+<p><img src="/images/pyspark.png" alt="" width="800px" /></p>
+<div align="center">
+<sup>Python version of the Spark shell.</sup>
+</div>
+
+<p><img src="/images/scala_spark.png" alt="" width="800px" /></p>
+<div align="center">
+<sup>Scala version of the Spark shell.</sup>
+</div>
+:ET

@@ -1,0 +1,10 @@
+I"R<ul id="markdown-toc">
+  <li><a href="#problem" id="markdown-toc-problem">Problem</a></li>
+</ul>
+
+<p>This post refers to <a href="https://largecats.github.io/2019/06/17/Build-blog/">how this particular blog site is configured</a>.</p>
+
+<h2 id="problem">Problem</h2>
+
+<p>I want to insert an image in a blog post in a way that is consistent when viewing it locally and after pushing it to GitHub. This means I cannot use absolute path. Also, I do not want to use another online drive to store my pictures. This means I cannot use an url of the image. That leaves me with using relative path.</p>
+:ET

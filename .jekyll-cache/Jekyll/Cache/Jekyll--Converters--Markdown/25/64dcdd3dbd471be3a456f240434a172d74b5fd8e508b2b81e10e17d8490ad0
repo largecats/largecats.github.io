@@ -1,0 +1,20 @@
+I"=<ul id="markdown-toc">
+  <li><a href="#motivation" id="markdown-toc-motivation">Motivation</a></li>
+  <li><a href="#preparation" id="markdown-toc-preparation">Preparation</a></li>
+</ul>
+
+<h2 id="motivation">Motivation</h2>
+
+<p>I came across <a href="https://www.youtube.com/watch?v=1LBFR90f6rg">this motion comic</a> (click <a href="https://www.bilibili.com/video/av2786047">here</a> for the video if the link does not work) based on issue 16 of the IDW comic <em>The Transformers: More than Meets the Eye</em> (click <a href="https://www.transformers.kiev.ua/index.php?pageid=idw">here</a> to view the comic in Russian or English and <a href="http://www.tfg2.com/read.php?tid-45122.html">here</a> to view in Chinese).</p>
+
+<p>In the motion comic, a video message is composed by putting together footage from various videos. I wanted to do the same with the image dimension, i.e., compose an image message by putting together various cropped images from the comics in a Montage-ish manner, as shown below. To read the message, just read off the speech bubbles in each image from left to right and top to down.</p>
+
+<div style="text-align: center"><img src="/images/rewind-message.png" width="800px" /></div>
+<div align="center">
+<sup>Page 18-19 of The Transformers: More than Meets the Eye #16.</sup>
+</div>
+
+<h2 id="preparation">Preparation</h2>
+
+<p>I read <a href="https://www.pyimagesearch.com/2017/07/10/using-tesseract-ocr-python/">this article</a> about the OCR engine Tesseract and <a href="https://docs.opencv.org/3.3.0/d7/d4d/tutorial_py_thresholding.html">this one</a> about OpenCV.</p>
+:ET

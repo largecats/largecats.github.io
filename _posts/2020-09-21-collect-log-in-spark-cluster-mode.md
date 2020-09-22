@@ -21,77 +21,57 @@ tags: spark YARN Linux-shell
 
 # Motivation   
 
-Spark has 2 deployment modes, client mode and cluster mode. Cluster mode is ideal for batch ETL jobs, but logs in cluster mode are not readily accessible as in client mode since they are generated to the stdout of different machines on the cluster. 
+Spark has 2 deployment modes, client mode and cluster mode. Cluster mode is ideal for batch ETL jobs submitted via the same "driver server" because the driver programs are run on the cluster instead of the driver server, thereby preventing the driver server from becoming the resource bottleneck. But in cluster mode, the driver server is only responsible for running a client process that submits the application, and the driver program is run on another machine in the cluster. This poses the following challenges:
 
-We want to take advantage of cluster mode in terms of resource while retaining the ability to
+1. We can't access the driver program's log from the driver server (only the client process' log is available to the driver server).
+2. We can't terminate the spark application via Ctrl-C or by marking success/killing tasks in the Airflow scheduler (doing so will only kill the client process running on the driver server, not the spark application itself).
 
-1. access and store logs for recent as well as historical jobs conveniently, and
-2. view log conveniently in real time.
+<div style="text-align: center"><img src="/images/cluster_mode-Page-1.png" width="600px" /></div>
+<div align="center">
+</div>
 
+We want to make use of cluster mode's advantage in terms of resource and find workarounds to:
 
-
-# Background   
-
-The differences between client mode and cluster mode are where the driver program runs (and thus whose resource the driver program uses) and who is responsible for communication with YARN and requesting resource from YARN.
-
-**Client mode**   
-
-* driver program runs on driver server (i.e., the server that launches the spark-submit program) and uses its resource
-* driver program is responsible for communication with YARN (it commands application master to request resource from YARN)
+1. Access and store logs for recent as well as historical jobs conveniently;
+2. View log conveniently in real time;
+3. Kill applications via keyboard or Airflow.
 
 
-**Cluster mode**   
-
-* driver program runs on the application master and uses the cluster resource
-* application master is responsible for both communication with YARN and requesting resource from YARN
-
-Client mode is suitable for cases  where
-* jobs are interactive spark-shell, 
-* jobs need to process local data on the driver server (since such data would not be readily available to the driver program in cluster mode).
-
-Cluster mode is suitable for jobs that process large volume of data and require much resource for the driver program (see [here](https://stackoverflow.com/questions/41124428/spark-yarn-cluster-vs-client-how-to-choose-which-one-to-use/41142747)). This is ideal especially for cases where the driver server is becoming the resource bottleneck. But in cluster mode, the logs are not as easily accessible as in client mode where they are visible from the console, and in most cases, we only have YARN's log aggregation to rely on.
-  
-The following sections explore a number of different workarounds and present a workable solution (at the end) that makes accessing and storing logs easy in cluster mode.
-
-# Challenges
-In cluster mode, the driver program runs on the cluster, i.e., on a machine other than the "driver server" which submits the application. This poses the following challenges.
-
-1. The driver program log is generated to the stdout of a machine other than the driver server which we have access to;
-2. Interrupting Spark application via Ctrl-C or by marking success/killing tasks in Airflow will only kill the process running on the driver server, not the Spark application itself.
-
-In other words, there is a degree of disconnection between the driver server, which we can access, and the spark application that is submitted to the cluster. The solution that worked effectively builds a bridge to resolve such disconnection.
 
 # Approaches   
 ## Redirect log to console in real time   
 
-In cluster mode, logs are generated to the stdout stream of machines other than the server that submits the application. Our search did not turn up any method that can write logs to our chosen directory in real time or print it to console: 
+A naiive approach is to attempt to to mimic the conveniences of client mode. Our search did not turn up any method that can redirect aggregated logs to our chosen directory in real time or print it to console.
 
-* [This post](https://stackoverflow.com/questions/23058663/where-are-logs-in-spark-on-yarn/26082707#26082707) does not say can
-* [This post](https://stackoverflow.com/questions/46725949/log4j-not-logging-in-spark-yarn-cluster-mode) seems to want to do the same thing as we do, but no solutions are raised
-* [This post](https://stackoverflow.com/questions/51014377/spark-driver-logs-on-edge-node-in-cluster-mode) says cannot
+* [This post](https://stackoverflow.com/questions/23058663/where-are-logs-in-spark-on-yarn/26082707#26082707) does not say can.
+* [This post](https://stackoverflow.com/questions/46725949/log4j-not-logging-in-spark-yarn-cluster-mode) seems to want to do the same thing as we do, but no solutions are raised.
+* [This post](https://stackoverflow.com/questions/51014377/spark-driver-logs-on-edge-node-in-cluster-mode) says cannot.
 
 ## Collect aggregated log after application is finished   
 
-Instead, we want to collect the aggregated logs to a designated directory using the `yarn logs -applicationId $applicationId` command after the spark application is finished. E.g., to collect log in HDFS:
+Instead, a more practical approach is to:
+
+1. Collect the aggregated logs to a designated directory using the `yarn logs -applicationId $applicationId` command after the spark application is finished. E.g., to collect log in HDFS:
 ```
 yarn logs -applicationId $applicationId -log_files stdout -am 1 | hadoop fs -appendToFile - /user/xxx/log_--dates_2020-09-21.txt
 ```
-or in driver server's local file system:
+or in the driver server's local file system:
 ```
 yarn logs -applicationId $applicationId -log_files stdout -am 1 |& tee -a /home/xxx/log_--dates_2020-09-21.txt
 ```
-To view log in real-time, we could either use the `watch` and `tail` commands or rely on YARN's UI.
+2. View log in real-time using the `watch` and `tail` commands or YARN's UI.
+3. Use `yarn application -kill $applicationId` to kill the spark application upon receiving termination signals from keyboard or Airflow.
 
-This approach means we need to consider two things:
+To implement this approach, we need to consider the following:
 
-1. applicationId: Where to get the applicationId that is needed to collect the aggregate logs from YARN, and
-2. flow control: How to make sure that log collection is triggered only after the application is finished (either exiting normally or terminating upon error), so that the log is complete.
+1. ApplicationId: How to get the applicationId that we need to collect aggregate logs from YARN and relay termination signals to the driver program;
+2. Flow control: How to make sure that log collection is triggered only after the application is finished (either exiting normally or terminating upon error), so that the log is complete.
 
-The applicationId is conveniently available via spark.sparkContext.applicationId in the .py script after creating a spark session, but the flow control is more conveniently done in shell script where we have a clear idea of when the spark-submit process terminates. We can put the log collection command in either the .py script or the shell script, with the understanding that either approach has trade-off.
+The applicationId is conveniently available via `spark.sparkContext.applicationId` in the .py script after creating a spark session, but the flow control is more conveniently done in shell script where we have a clear idea of when the spark-submit process terminates. We can put the log collection command in either the .py script or the shell script, with the understanding that either approach has trade-off.
 
 ### In .py script: Use customized sys.excepthook to trigger log collection upon any exception (X)   
 
-In .py script, the applicationId can be easily accessed via spark.sparkContext.applicationId. But to put the log collection command in .py script, we need to make sure that any event that triggers program termination, be it normal termination or exception, is caught and redirected to log collection. E.g., we could wrap a try...except block around the main entry point of the driver script in the pipeline. Yet this does not capture errors in the definition of the pipeline itself, or our customized common modules that are imported by the driver script. Instead, we considered using a customized sys.excepthook to catch exceptions globally.
+In .py script, the applicationId can be easily accessed via `spark.sparkContext.applicationId`. But to put the log collection command in .py script, we need to make sure that any event that triggers program termination, be it normal termination or exception, is caught and redirected to log collection. E.g., we could wrap a `try...except` block around the main entry point of the driver script in the pipeline. Yet this does not capture errors in the definition of the pipeline itself, or our customized common modules that are imported by the driver script. Instead, we considered using a customized sys.excepthook to catch exceptions globally.
 
 A customized excepthook is a function with 3 arguments `type, value, tback` and performs customized handling of the caught exception. In the example below, `except_hook`  returns a customized excepthook which, upon catching any exception, collects log using the applicationId supplied and calls the default handler `sys.__excepthook__()` to handle the exception.
 
@@ -124,13 +104,21 @@ This approach, however, is flawed in that the definition of our customized excep
 
 Another approach we considered and ended up adopting is to trigger log collection in shell script after the spark-submit process is finished. This has the advantage of providing a clear indication when the spark-submit process terminates. The trade-off, though, is that instead of getting the applicationId conveniently from the spark session, we need to parse the spark-submit process' output and extract the applicationId.
 
-A naive approach would be to print the applicationId from the spark session to pass it to the shell script. But the only way to do so is by printing the applicationId, and in cluster mode, this would go to the stdout of another machine in the cluster, which we cannot access from the driver server.
+A naiive approach would be to print the applicationId from the spark session to pass it to the shell script. But the only way to do so is by printing the applicationId, and in cluster mode, this would go to the stdout of another machine in the cluster, which we cannot access from the driver server.
 
 After some digging, we found that in cluster mode, the spark-submit command is launched by a client process, which starts on the driver server and exits as soon as it fulfills its responsibility of submitting the application to the cluster without waiting for the application to finish. The log of this client process contains the applicationId, and this log - because the client process is run by the driver server - can be printed to the driver server's console. In other words, this is the only place where the shell script can access the spark job's applicationId.
 
-[pic TBD]
+<div style="text-align: center"><img src="/images/client_process_log.png" width="600px" /></div>
+<div align="center">
+<sup>Client process log containing the applicationId.</sup>
+</div>
 
 #### Implementation
+
+<div style="text-align: center"><img src="/images/cluster_mode-Page-2.png" width="600px" /></div>
+<div align="center">
+</div>
+
 **Print client process log to console**   
 
 1. Add a log4j.properties file as follows. AS shown above, the applicationId in the client process' log is INFO level. So we need to set log4j.logger.Client  to INFO  level.
@@ -156,9 +144,8 @@ spark-submit --verbose \
 **Parse client process log to get applicationId**   
 
 1. Launch the client process via `run`.
-2. Set trap for the interruption signals SIGINT, SIGTERM to kill the application upon receiving these signals.
-   1. Again, because spark applications in cluster mode run on the cluster, they will not receive any termination signal sent via the driver server. This means Ctrl-C (SIGINT), marking success or killing in Airflow (SIGTERM) would only kill the client process, but not the spark application itself. Instead, we need to explicitly invoke the yarn application -kill $applicationId  command upon receiving the termination signals.
-3. Read the client process' log line by line until reaching the line containing the applicationId. Extract the applicationId.
+2. Set trap for the interruption signals SIGINT, SIGTERM to kill the application upon receiving termination signals SIGINT (Ctrl-C) and SIGTERM (Airflow mark success/kill).
+3. Read the client process' log line by line to extract the applicationId.
 
 ```
 #!/bin/bash
@@ -205,7 +192,7 @@ for arg in ${param[@]}
 APPLICATION_ID=""
 
 # prepare to kill application via YARN upon receiving SIGINT (Ctrl-C), SIGTERM (Airflow) signals
-trap 'keyboard_interrupt $APPLICATION_ID' SIGINT SIGTERM # use single quotes to delay variable expansion till when the function is called
+trap 'kill_app $APPLICATION_ID' SIGINT SIGTERM # use single quotes to delay variable expansion till when the function is called
 trapExit=$?
 
 # read output of run() line by line to find applicationId
@@ -230,7 +217,7 @@ where `shell_functions.sh` include:
 
 #!/bin/bash
 
-keyboard_interrupt() {
+kill_app() {
     echo "Interrupted by keyboard."
     applicationId=$1
     if [ $applicationId != "" ]
@@ -371,24 +358,40 @@ exit_with_code() {
 #### Workflow
 [YARN's spark application statuses](https://hadoop.apache.org/docs/current/hadoop-yarn/hadoop-yarn-site/YarnCommands.html#application) are:
 
-(pic - TBD)
+<div style="text-align: center"><img src="/images/spark_application_statuses.png" width="800px" /></div>
+<div align="center">
+</div>
 
 [YARN's log aggregation statuses](http://hadoop.apache.org/docs/r3.1.0/hadoop-yarn/hadoop-yarn-api/apidocs/org/apache/hadoop/yarn/api/records/LogAggregationStatus.html) are:
 
-(pic - TBD)
+<div style="text-align: center"><img src="/images/yarn_log_aggregation_statuses.png" width="600px" /></div>
+<div align="center">
+</div>
 
 When the spark application terminates normally or upon exception, `collect_log` will be triggered to copy the logs aggregated by YARN to a designated directory.
 
-What to do when the spark application is killed (either by Ctrl-C or via Airflow), on the other hand, requires extra handling.
+What to do when the spark application is killed, on the other hand, requires extra handling.
 
 If the job is killed before reaching SUBMITTED status
-* `keyboard_interrupt` won't be invoked as the spark application is not yet launched;
+* `kill_app` won't be invoked as the spark application is not yet launched;
 * `collect_log` won't be triggered as no log is generated.
+
+<div style="text-align: center"><img src="/images/spark_application_kill_before_submitted.png" width="800px" /></div>
+<div align="center">
+</div>
 
 If the job is killed in or after SUBMITTED status but before reaching RUNNING status
-* `keyboard_interrupt` will be invoked to kill the application before eventually exiting from the client process;
+* `kill_app` will be invoked to kill the application before eventually exiting from the client process;
 * `collect_log` won't be triggered as no log is generated.
 
+<div style="text-align: center"><img src="/images/spark_application_kill_before_running.png" width="800px" /></div>
+<div align="center">
+</div>
+
 If the job is killed after RUNNING status
-* `keyboard_interrupt` will be invoked to kill the application before eventually exiting from the client process;
+* `kill_app` will be invoked to kill the application before eventually exiting from the client process;
 * `collect_log` will be triggered to collect the YARN aggregated logs after the application is killed.
+
+<div style="text-align: center"><img src="/images/spark_application_kill_after_running.png" width="800px" /></div>
+<div align="center">
+</div>

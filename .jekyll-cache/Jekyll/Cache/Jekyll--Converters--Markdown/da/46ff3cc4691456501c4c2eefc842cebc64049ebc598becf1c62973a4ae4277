@@ -1,0 +1,10 @@
+I"Ÿ<ul id="markdown-toc">
+  <li><a href="#problem" id="markdown-toc-problem">Problem</a></li>
+</ul>
+
+<p>This post refers to <a href="https://largecats.github.io/2019/06/17/Build-blog/">how this particular blog site is configured</a>.</p>
+
+<h2 id="problem">Problem</h2>
+
+<p>The main page of my blog site displayed the entire length of each of my blog post. I wanted to display an excerpt of each blog post instead.</p>
+:ET

@@ -1,0 +1,13 @@
+I"ç<ul id="markdown-toc">
+  <li><a href="#motivation" id="markdown-toc-motivation">Motivation</a></li>
+  <li><a href="#preparation" id="markdown-toc-preparation">Preparation</a></li>
+</ul>
+
+<h2 id="motivation">Motivation</h2>
+
+<p>I want to use spark via both python and scala with Jupyter notebook without having to import all those modules associated with pyspark. I‚Äôm using Windows.</p>
+
+<h2 id="preparation">Preparation</h2>
+
+<p>This post assumes configurations <a href="https://largecats.github.io/2019/07/31/install-spark-on-windows/">here</a> and <a href="https://largecats.github.io/2019/07/31/set-up-pyspark-with-jupyter-notebook/">here</a>.</p>
+:ET

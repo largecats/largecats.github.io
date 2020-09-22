@@ -1,0 +1,83 @@
+I"²$<ul id="markdown-toc">
+  <li><a href="#motivation" id="markdown-toc-motivation">Motivation</a></li>
+  <li><a href="#preparation" id="markdown-toc-preparation">Preparation</a></li>
+  <li><a href="#method" id="markdown-toc-method">Method</a>    <ul>
+      <li><a href="#option-1-open-notebook-directly-from-pyspark" id="markdown-toc-option-1-open-notebook-directly-from-pyspark">Option 1: Open notebook directly from PySpark</a></li>
+      <li><a href="#option-2-invoke-spark-environment-in-notebook-on-the-fly" id="markdown-toc-option-2-invoke-spark-environment-in-notebook-on-the-fly">Option 2: Invoke Spark environment in notebook on the fly</a></li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="motivation">Motivation</h2>
+
+<p>I want to use PySpark form Jupyter Notebook for covenient view of program output.</p>
+
+<h2 id="preparation">Preparation</h2>
+
+<p>This post assumes configurations in <a href="https://largecats.github.io/2019/07/31/set-up-spark-on-windows/">this earlier post</a>. I read <a href="https://blog.sicara.com/get-started-pyspark-jupyter-guide-tutorial-ae2fe84f594f">this article</a>.</p>
+
+<h2 id="method">Method</h2>
+
+<p>There are two ways to set up PySpark with Jupyter Notebook. They are explained in detail in the article above. I would like to supplement the article by providing a summary and highlighting some caveats.</p>
+
+<h3 id="option-1-open-notebook-directly-from-pyspark">Option 1: Open notebook directly from PySpark</h3>
+
+<ol>
+  <li>Create environment variables <code class="language-plaintext highlighter-rouge">PYSPARK_DRIVER_PYTHON</code> and <code class="language-plaintext highlighter-rouge">PYSPARK_DRIVER_PYTHON_OPTS</code> and set them to be <code class="language-plaintext highlighter-rouge">jupyter</code> and <code class="language-plaintext highlighter-rouge">'notebook'</code>, respectively.</li>
+  <li>Open <code class="language-plaintext highlighter-rouge">cmd</code> and type <code class="language-plaintext highlighter-rouge">pyspark</code>, this should open Jupyter Notebook in the browser.</li>
+  <li>Run the following code in the notebook. (<code class="language-plaintext highlighter-rouge">sample.txt</code> is taken from the <a href="https://en.wikipedia.org/wiki/Apache_Spark">wikipedia page of Apache Spark</a>.)
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="kn">import</span> <span class="nn">random</span>
+ <span class="n">num_samples</span> <span class="o">=</span> <span class="mi">100000000</span>
+ <span class="k">def</span> <span class="nf">inside</span><span class="p">(</span><span class="n">p</span><span class="p">):</span>     
+ <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">random</span><span class="p">.</span><span class="n">random</span><span class="p">(),</span> <span class="n">random</span><span class="p">.</span><span class="n">random</span><span class="p">()</span>
+ <span class="k">return</span> <span class="n">x</span><span class="o">*</span><span class="n">x</span> <span class="o">+</span> <span class="n">y</span><span class="o">*</span><span class="n">y</span> <span class="o">&lt;</span> <span class="mi">1</span>
+ <span class="n">count</span> <span class="o">=</span> <span class="n">sc</span><span class="p">.</span><span class="n">parallelize</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">num_samples</span><span class="p">)).</span><span class="nb">filter</span><span class="p">(</span><span class="n">inside</span><span class="p">).</span><span class="n">count</span><span class="p">()</span>
+ <span class="n">pi</span> <span class="o">=</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">count</span> <span class="o">/</span> <span class="n">num_samples</span>
+ <span class="k">print</span><span class="p">(</span><span class="n">pi</span><span class="p">)</span>
+
+ <span class="n">lines</span> <span class="o">=</span> <span class="n">sc</span><span class="p">.</span><span class="n">textFile</span><span class="p">(</span><span class="s">"sample.txt"</span><span class="p">)</span>
+ <span class="k">print</span><span class="p">(</span><span class="n">lines</span><span class="p">.</span><span class="n">count</span><span class="p">())</span>
+ <span class="k">print</span><span class="p">(</span><span class="n">lines</span><span class="p">.</span><span class="n">first</span><span class="p">())</span>
+</code></pre></div>    </div>
+    <p>The output should look like this. 
+ <img src="/images/direct-open-tryout.png" alt="" width="800px" /></p>
+  </li>
+</ol>
+
+<h3 id="option-2-invoke-spark-environment-in-notebook-on-the-fly">Option 2: Invoke Spark environment in notebook on the fly</h3>
+
+<ol>
+  <li>Install <code class="language-plaintext highlighter-rouge">findspark</code> module by typing <code class="language-plaintext highlighter-rouge">pip install findspark</code>.</li>
+  <li>Create environment variable <code class="language-plaintext highlighter-rouge">SPARK_HOME</code> and set it to the path of Spark installation.</li>
+  <li>Launch Jupyter Notebook.</li>
+  <li>Paste the following code at the start of the notebook.
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="kn">import</span> <span class="nn">findspark</span>
+ <span class="n">findspark</span><span class="p">.</span><span class="n">init</span><span class="p">()</span>
+ <span class="kn">import</span> <span class="nn">pyspark</span>
+</code></pre></div>    </div>
+  </li>
+  <li>Run the following code.
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="kn">import</span> <span class="nn">random</span>
+ <span class="n">sc</span> <span class="o">=</span> <span class="n">pyspark</span><span class="p">.</span><span class="n">SparkContext</span><span class="p">()</span>
+ <span class="n">num_samples</span> <span class="o">=</span> <span class="mi">100000000</span>
+ <span class="k">def</span> <span class="nf">inside</span><span class="p">(</span><span class="n">p</span><span class="p">):</span>     
+ <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">random</span><span class="p">.</span><span class="n">random</span><span class="p">(),</span> <span class="n">random</span><span class="p">.</span><span class="n">random</span><span class="p">()</span>
+ <span class="k">return</span> <span class="n">x</span><span class="o">*</span><span class="n">x</span> <span class="o">+</span> <span class="n">y</span><span class="o">*</span><span class="n">y</span> <span class="o">&lt;</span> <span class="mi">1</span>
+ <span class="n">count</span> <span class="o">=</span> <span class="n">sc</span><span class="p">.</span><span class="n">parallelize</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">num_samples</span><span class="p">)).</span><span class="nb">filter</span><span class="p">(</span><span class="n">inside</span><span class="p">).</span><span class="n">count</span><span class="p">()</span>
+ <span class="n">pi</span> <span class="o">=</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">count</span> <span class="o">/</span> <span class="n">num_samples</span>
+ <span class="k">print</span><span class="p">(</span><span class="n">pi</span><span class="p">)</span>
+ <span class="n">sc</span><span class="p">.</span><span class="n">stop</span><span class="p">()</span>
+
+ <span class="n">sc</span> <span class="o">=</span> <span class="n">pyspark</span><span class="p">.</span><span class="n">SparkContext</span><span class="p">()</span>
+ <span class="n">lines</span> <span class="o">=</span> <span class="n">sc</span><span class="p">.</span><span class="n">textFile</span><span class="p">(</span><span class="s">"sample.txt"</span><span class="p">)</span>
+ <span class="k">print</span><span class="p">(</span><span class="n">lines</span><span class="p">.</span><span class="n">count</span><span class="p">())</span>
+ <span class="k">print</span><span class="p">(</span><span class="n">lines</span><span class="p">.</span><span class="n">first</span><span class="p">())</span>
+ <span class="n">sc</span><span class="p">.</span><span class="n">stop</span><span class="p">()</span>
+</code></pre></div>    </div>
+    <p>The output should look like this. 
+ <img src="/images/findspark-tryout.png" alt="" width="800px" /></p>
+  </li>
+</ol>
+
+<p>Note that option 1 does not require manually creating a <code class="language-plaintext highlighter-rouge">SparkContext</code> object, while option 2 does. As a result, if the notebook created in option 1 is not opened from PySpark but from a regular Jupyter Notebook, the <code class="language-plaintext highlighter-rouge">sc</code> variable would not be recognized. Vice versa, if the notebook created in option 2 is opened from PySpark, the line <code class="language-plaintext highlighter-rouge">sc = pyspark.SparkContext()</code> would be redundant, and the program would raise an error saying that only one <code class="language-plaintext highlighter-rouge">SparkContext</code> can be run at once.</p>
+:ET

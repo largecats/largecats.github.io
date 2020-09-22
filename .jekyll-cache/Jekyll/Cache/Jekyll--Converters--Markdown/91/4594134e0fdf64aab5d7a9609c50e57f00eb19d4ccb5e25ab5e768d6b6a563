@@ -1,0 +1,27 @@
+I"`<ul id="markdown-toc">
+  <li><a href="#problem" id="markdown-toc-problem">Problem</a></li>
+  <li><a href="#solution" id="markdown-toc-solution">Solution</a></li>
+</ul>
+
+<h2 id="problem">Problem</h2>
+<p>I was updating my backup drive and needed to delete some huge folders on that drive. Deleting large folders in Windows explorer could take quite a while because Windows would first calculate the folder’s size, which is time-consuming. Therefore, it would be great to know how to quickly delete huge folders on Windows.</p>
+
+<h2 id="solution">Solution</h2>
+<p>Suppose the large folder to be deleted is called <code class="language-plaintext highlighter-rouge">foldername</code>.</p>
+
+<ol>
+  <li>Open cmd.</li>
+  <li>Type <code class="language-plaintext highlighter-rouge">cd C:\backup\foldername</code> to navigate to the folder to be deleted.</li>
+  <li>
+    <p>Type <code class="language-plaintext highlighter-rouge">del /f/q/s *.* &gt; nul</code> to delete all files in <code class="language-plaintext highlighter-rouge">foldername</code>, while leaving the folder structure intact (for now).</p>
+
+    <p>Explanation of this command can be found in the <a href="https://docs.microsoft.com/en-us/windows-server/administration/windows-commands/del">Microsoft documentation</a>.</p>
+  </li>
+  <li>Type <code class="language-plaintext highlighter-rouge">cd ..</code> to navigate to the parent folder of <code class="language-plaintext highlighter-rouge">foldername</code>.</li>
+  <li>
+    <p>Type <code class="language-plaintext highlighter-rouge">rmdir /q/s foldername</code> to delete <code class="language-plaintext highlighter-rouge">foldername</code> along with its subfolders.</p>
+
+    <p>Explanation of this command can be found in the <a href="https://docs.microsoft.com/en-us/windows-server/administration/windows-commands/rmdir">Microsoft documentation</a>.</p>
+  </li>
+</ol>
+:ET

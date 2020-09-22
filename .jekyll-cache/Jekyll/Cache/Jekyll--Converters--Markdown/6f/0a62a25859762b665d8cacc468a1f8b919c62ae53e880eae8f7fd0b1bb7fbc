@@ -1,0 +1,321 @@
+I"�<ul id="markdown-toc">
+  <li><a href="#motivation" id="markdown-toc-motivation">Motivation</a></li>
+  <li><a href="#preparation" id="markdown-toc-preparation">Preparation</a></li>
+  <li><a href="#method" id="markdown-toc-method">Method</a>    <ul>
+      <li><a href="#scraping-movie-reviews" id="markdown-toc-scraping-movie-reviews">Scraping movie reviews</a></li>
+      <li><a href="#text-analysis" id="markdown-toc-text-analysis">Text analysis</a>        <ul>
+          <li><a href="#word-cloud" id="markdown-toc-word-cloud">Word cloud</a>            <ul>
+              <li><a href="#pre-processing" id="markdown-toc-pre-processing">Pre-processing</a></li>
+              <li><a href="#result" id="markdown-toc-result">Result</a></li>
+            </ul>
+          </li>
+          <li><a href="#sentiment-analysis" id="markdown-toc-sentiment-analysis">Sentiment analysis</a>            <ul>
+              <li><a href="#pre-processing-1" id="markdown-toc-pre-processing-1">Pre-processing</a></li>
+              <li><a href="#result-1" id="markdown-toc-result-1">Result</a></li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="motivation">Motivation</h2>
+
+<p>When <a href="https://www.imdb.com/title/tt4701182/"><em>Bumblebee</em></a> was released, I wanted to see what people would say about it and how its reception would compare with the other productions in the Transformers franchise.</p>
+
+<h2 id="preparation">Preparation</h2>
+
+<p>I read <a href="https://www.datacamp.com/community/tutorials/text-analytics-beginners-nltk">this article</a> about NLTK and <a href="https://amueller.github.io/word_cloud/auto_examples/a_new_hope.html">this documentation</a> about a module for word cloud.</p>
+
+<h2 id="method">Method</h2>
+
+<p>All code can be found <a href="https://github.com/largecats/text-analysis/tree/master/movie-review">here</a>.</p>
+
+<h3 id="scraping-movie-reviews">Scraping movie reviews</h3>
+
+<p>Using techniques discussed <a href="https://largecats.github.io/2019/06/18/Scrape-movie-information/">here</a>, I collected the IMDb reviews for <em>Bumblebee</em> and seven other productions in the franchise. The only difference is that there are more dynamic web content to deal with this time: There are many “load more” buttons on the web page that need to be clicked in order to see all the movie reviews. Luckily, this can be taken care of by the <code class="language-plaintext highlighter-rouge">click()</code> method of a button object made possible via Selenium, in a manner as follows.</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># click "load more" to load all results until there is no more "load more" button
+</span><span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">loadMoreButton</span> <span class="o">=</span> <span class="n">browser</span><span class="p">.</span><span class="n">find_element_by_class_name</span><span class="p">(</span><span class="s">'ipl-load-more__button'</span><span class="p">)</span>
+        <span class="n">loadMoreButton</span><span class="p">.</span><span class="n">click</span><span class="p">()</span>
+        <span class="c1"># wait for the next load more button to load; note that if the wait is too short, the next load button may not be clicked
+</span>        <span class="n">time</span><span class="p">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span> 
+    <span class="k">except</span><span class="p">:</span>
+        <span class="k">break</span>
+</code></pre></div></div>
+<p>The resulting data file for the movie <em>Bumblebee</em> looks something like this:</p>
+
+<p><img src="/images/BBB-review-csv.png" alt="" width="800px" /></p>
+
+<h3 id="text-analysis">Text analysis</h3>
+
+<h4 id="word-cloud">Word cloud</h4>
+
+<p>I wanted to see what people say about the movie, so it makes sense to visualize the key words that appear in the reviews, e.g., via a word cloud. Both the reviews and their titles can be used as corpus. Their differences are discussed at the end of this section.</p>
+
+<h5 id="pre-processing">Pre-processing</h5>
+
+<p>Before making the visualization, the text needs to be pre-processed. We begin by importing the necessary modules.</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">nltk</span>
+<span class="kn">import</span> <span class="nn">csv</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="n">pd</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="n">np</span>
+</code></pre></div></div>
+<p>After reading in the <code class="language-plaintext highlighter-rouge">.csv</code> file, we tokenize the text into individual words which are the units of analysis.</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">fileName</span> <span class="o">=</span> <span class="s">"reviews.csv"</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">fileName</span><span class="p">)</span>
+
+<span class="kn">from</span> <span class="nn">nltk.tokenize</span> <span class="kn">import</span> <span class="n">word_tokenize</span>
+<span class="n">tokenizedWords</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">.</span><span class="n">index</span><span class="p">)):</span>
+    <span class="n">review</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s">'review'</span><span class="p">][</span><span class="n">i</span><span class="p">]</span>
+    <span class="n">tokenizedWord</span> <span class="o">=</span> <span class="n">word_tokenize</span><span class="p">(</span><span class="n">review</span><span class="p">)</span>
+    <span class="n">tokenizedWords</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">tokenizedWord</span><span class="p">)</span>
+</code></pre></div></div>
+<p><code class="language-plaintext highlighter-rouge">tokenizedWords</code> is now a list of lists of individual words or punctuation marks, e.g.,</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[['I', 'was', 'a', 'Transformers', 'and', 'Beast', 'Wars', 'fan', 'from', 'the', '90', "'s", ',', 'I', 'enjoyed', 'the', 'first', 'two', 'movies', 'from', 'Michael', 'Bay', ',',
+'then', 'the', 'rest', 'was', 'horrible', '.', 'The', 'first', '5', 'minutes', 'of', '*Bumblebee*', 'were', 'good', ',', 'then', 'its', 'goes', 'to', 'sh**', '.', '90', '%', 'of', 'the', 'movie', 'focuses', 'on', 'the', 'teenager', "'s", 'life', 'and', 'lame', 'complications', 'and', 'fears', '.', 'We', 'barely', 'see', 'some', 'action', 'from', '*Bumblebee*', ',', 'he', 'is', 'mostly', 'being', 'all', 'cuddly', 'and', 'acting', 'like', 'a', 'puppy', '.', 'Instead', 'of', 'focusing', 'on', 'the', 'origins', 'of', 'the', 'Transformers', 'and', 'Orion', 'Pax', ',', 'we', 'are', 'hear', 'watching', 'the', 'girl', 'being', 'bullied', 'for', 'not', 'taking', 'the', 'dive', '...', 'then', 'conveniently', 'having', 'to', 'take', 'the', 'dive', 'in', 'the', 'end', 'of', 'the', 'movie', 'to', '...', 'I', 'do', "n't", 'know', 'how', 'she', 'helps', '*Bumblebee*', 'underwater', '.', 'That', 'scene', 'on', 'the', 'road', 'where', 'she', 'aske', 'her', 'friend', 'to', 'take', 'off', 'his', 'shirt', 'to', 'just', 'wrap', 'it', 'around', 'her', 'head', 'and', 'scream', 'out', 'of', 'the', 'car', '...', 'when', 'she', 'is', 'clearly', 'wearing', 'a', 'shirt', 'over', 'a', 't-shirt', '...', 'stupid..', 'That', 'Salute', 'sign', 'from', 'Cena', 'at', 'the', 'end..', 'I', 'felt', 'like', 'i', 'was', 'watching', 'a', 'combination', 'of', 'Mighty', 'Joe', 'Young', 'and', 'Herbie', 'Reloaded', '.', 'Horrible..'], ...]
+</code></pre></div></div>
+<p>Since the units of analysis are words, there is no need to keep the list of lists structure, and so we merge these lists into one list.</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">words</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">tokenizedWord</span> <span class="ow">in</span> <span class="n">tokenizedWords</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">tokenizedWord</span><span class="p">:</span>
+        <span class="n">words</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">word</span><span class="p">)</span>
+</code></pre></div></div>
+<p>Next, we remove the stop words and punctuation marks from this list of words, while turning all remaining words into lower-case.</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># remove stop words and punctuations
+</span><span class="kn">from</span> <span class="nn">nltk.corpus</span> <span class="kn">import</span> <span class="n">stopwords</span>
+<span class="n">punctuations</span> <span class="o">=</span> <span class="p">[</span><span class="s">'.'</span><span class="p">,</span> <span class="s">','</span><span class="p">,</span> <span class="s">';'</span><span class="p">,</span> <span class="s">':'</span><span class="p">,</span> <span class="s">'!'</span><span class="p">,</span> <span class="s">'?'</span><span class="p">]</span>
+<span class="n">stopWords</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">stopwords</span><span class="p">.</span><span class="n">words</span><span class="p">(</span><span class="s">"english"</span><span class="p">))</span>
+<span class="n">filteredWords</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">words</span><span class="p">:</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">word</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">stopWords</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">word</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">punctuations</span><span class="p">):</span>
+        <span class="c1"># turn into lower case
+</span>        <span class="n">filteredWords</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">word</span><span class="p">.</span><span class="n">lower</span><span class="p">())</span>
+<span class="n">words</span> <span class="o">=</span> <span class="n">filteredWords</span>
+</code></pre></div></div>
+<p>We also need to do lemmatization, that is, to “normalize” the words by restoring all variations (e.g., past tense, pural form) back to their original form. To do so, we first tag the words as verb, proposition, adjective, etc, and then convert them to their original forms accordingly. E.g., “movies” becomes “movie”, “watched” becomes “watch”.</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># pos Tagging
+</span><span class="n">tags</span> <span class="o">=</span> <span class="n">nltk</span><span class="p">.</span><span class="n">pos_tag</span><span class="p">(</span><span class="n">words</span><span class="p">)</span>
+
+<span class="c1"># lemmatization
+</span><span class="kn">from</span> <span class="nn">nltk.stem.wordnet</span> <span class="kn">import</span> <span class="n">WordNetLemmatizer</span>
+<span class="n">lem</span> <span class="o">=</span> <span class="n">WordNetLemmatizer</span><span class="p">()</span>
+<span class="n">lemWords</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">words</span><span class="p">)):</span>
+    <span class="n">word</span> <span class="o">=</span> <span class="n">words</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+    <span class="n">tag</span> <span class="o">=</span> <span class="n">tags</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">tag</span> <span class="o">==</span> <span class="s">'VB'</span> <span class="ow">or</span> <span class="n">tag</span> <span class="o">==</span> <span class="s">'VBP'</span><span class="p">:</span>
+        <span class="n">lemWord</span> <span class="o">=</span> <span class="n">lem</span><span class="p">.</span><span class="n">lemmatize</span><span class="p">(</span><span class="n">word</span><span class="p">,</span> <span class="s">"v"</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">tag</span> <span class="o">==</span> <span class="s">"PRP"</span><span class="p">:</span>
+        <span class="n">lemWord</span> <span class="o">=</span> <span class="n">word</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">lemWord</span> <span class="o">=</span> <span class="n">lem</span><span class="p">.</span><span class="n">lemmatize</span><span class="p">(</span><span class="n">word</span><span class="p">)</span>
+    <span class="n">lemWords</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">lemWord</span><span class="p">)</span>
+</code></pre></div></div>
+<p>Lastly, we remove some uninformative words whose presence do not mean much in the context of the text to be analyzed, e.g., the name of the movie, the franchise, etc.</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># remove uninformative words
+</span><span class="n">filteredWords</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">lemWord</span> <span class="ow">in</span> <span class="n">lemWords</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">lemWord</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s">"movie"</span><span class="p">,</span> <span class="s">"film"</span><span class="p">,</span> <span class="s">"review"</span><span class="p">,</span> <span class="s">"spoiler"</span><span class="p">,</span> <span class="s">"transformer"</span><span class="p">,</span> <span class="s">"transformers"</span><span class="p">,</span> <span class="s">"n't"</span><span class="p">,</span> <span class="s">"age"</span><span class="p">,</span> <span class="s">"extinction"</span><span class="p">,</span> <span class="s">"dark"</span><span class="p">,</span> <span class="s">"moon"</span><span class="p">,</span> <span class="s">"last"</span><span class="p">,</span> <span class="s">"knight"</span><span class="p">,</span> <span class="s">"revenge"</span><span class="p">,</span> <span class="s">"fallen"</span><span class="p">,</span> <span class="s">"one"</span><span class="p">,</span> <span class="s">"episode"</span><span class="p">,</span> <span class="s">"series"</span><span class="p">,</span> <span class="s">"show"</span><span class="p">,</span> <span class="s">"season"</span><span class="p">]:</span>
+        <span class="n">filteredWords</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">lemWord</span><span class="p">)</span>
+</code></pre></div></div>
+<p>The word cloud can be created as follows. The mask can be customized.</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># merge list of words into one string
+</span><span class="n">text</span> <span class="o">=</span> <span class="s">' '</span><span class="p">.</span><span class="n">join</span><span class="p">(</span><span class="n">filteredWords</span><span class="p">)</span>
+
+<span class="c1"># create word cloud
+</span><span class="kn">from</span> <span class="nn">PIL</span> <span class="kn">import</span> <span class="n">Image</span>
+<span class="kn">from</span> <span class="nn">wordcloud</span> <span class="kn">import</span> <span class="n">WordCloud</span><span class="p">,</span> <span class="n">STOPWORDS</span><span class="p">,</span> <span class="n">ImageColorGenerator</span>
+
+<span class="k">def</span> <span class="nf">grey_color_func</span><span class="p">(</span><span class="n">word</span><span class="p">,</span> <span class="n">font_size</span><span class="p">,</span> <span class="n">position</span><span class="p">,</span> <span class="n">orientation</span><span class="p">,</span> <span class="n">random_state</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">return</span> <span class="s">"hsl(0, 0%%, %d%%)"</span> <span class="o">%</span> <span class="n">random</span><span class="p">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">60</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+
+<span class="c1"># mask
+</span><span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">array</span><span class="p">(</span><span class="n">Image</span><span class="p">.</span><span class="nb">open</span><span class="p">(</span><span class="s">"BBB_poster.jpg"</span><span class="p">))</span>
+<span class="c1"># generate word cloud image
+</span><span class="n">wordcloud</span> <span class="o">=</span> <span class="n">WordCloud</span><span class="p">(</span><span class="n">mask</span> <span class="o">=</span> <span class="n">mask</span><span class="p">).</span><span class="n">generate</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+
+<span class="c1"># diplay image
+</span><span class="n">plt</span><span class="p">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">18</span><span class="p">,</span><span class="mi">12</span><span class="p">))</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">wordcloud</span><span class="p">.</span><span class="n">recolor</span><span class="p">(</span><span class="n">color_func</span> <span class="o">=</span> <span class="n">grey_color_func</span><span class="p">,</span> <span class="n">random_state</span> <span class="o">=</span> <span class="mi">3</span><span class="p">),</span> <span class="n">interpolation</span> <span class="o">=</span> <span class="s">'bilinear'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">axis</span><span class="p">(</span><span class="s">"off"</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">savefig</span><span class="p">(</span><span class="s">"review_wordcloud.png"</span><span class="p">,</span> <span class="nb">format</span> <span class="o">=</span> <span class="s">"png"</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+</code></pre></div></div>
+<h5 id="result">Result</h5>
+
+<p>Below is a wordcloud of the reviews for <em>Bumblebee</em>, followed by that of the review titles.</p>
+
+<p><img src="/images/BBB-review-wordcloud.png" alt="" width="800px" /></p>
+<div align="center">
+<sup>Word cloud of movies reviews of Bumblebee.</sup>
+</div>
+
+<p><img src="/images/BBB-title-wordcloud.png" alt="" width="800px" /></p>
+<div align="center">
+<sup>Word cloud of movie review titles of Bumblebee.</sup>
+</div>
+
+<p>The wordcloud of the movie review titles seems to contain less noise, or uninformative words. This is expected as the reviews have not been filtered for words of importance using metrics such as the <a href="http://www.tfidf.com/">TF-IDF score</a>. In light of this, I generated word clouds from the titles of movie reviews of some of the other movies in the franchise, listed below.</p>
+
+<p><img src="/images/G1_wordcloud.png" alt="" width="800px" /></p>
+<div align="center">
+<sup><a href="https://www.imdb.com/title/tt0086817/reviews?sort=helpfulnessScore&amp;dir=desc&amp;ratingFilter=0">G1</a>.</sup>
+</div>
+
+<p><img src="/images/G1_The_Movie_wordcloud.png" alt="" width="800px" /></p>
+<div align="center">
+<sup><a href="https://www.imdb.com/title/tt0092106/reviews?sort=helpfulnessScore&amp;dir=desc&amp;ratingFilter=0">G1 The Movie</a>.</sup>
+</div>
+
+<p><img src="/images/TF1_wordcloud.png" alt="" width="800px" /></p>
+<div align="center">
+<sup><a href="https://www.imdb.com/title/tt0418279/reviews?sort=helpfulnessScore&amp;dir=desc&amp;ratingFilter=0">Transformers (2007)</a>.</sup>
+</div>
+
+<p><img src="/images/TF2_wordcloud.png" alt="" width="800px" /></p>
+<div align="center">
+<sup><a href="https://www.imdb.com/title/tt1055369/reviews?sort=helpfulnessScore&amp;dir=desc&amp;ratingFilter=0">Transformers: Revenge of the Fallen</a>.</sup>
+</div>
+
+<p><img src="/images/TF3_wordcloud.png" alt="" width="800px" /></p>
+<div align="center">
+<a href="https://www.imdb.com/title/tt1399103/reviews?sort=helpfulnessScore&amp;dir=desc&amp;ratingFilter=0">Transformers: Dark of the Moon</a>.
+</div>
+
+<p><img src="/images/TF4_wordcloud.png" alt="" width="800px" /></p>
+<div align="center">
+<sup><a href="https://www.imdb.com/title/tt2109248/reviews?sort=helpfulnessScore&amp;dir=desc&amp;ratingFilter=0">Transformers: Age of Extinction</a>.</sup>
+</div>
+
+<p><img src="/images/TF5_wordcloud.png" alt="" width="800px" /></p>
+<div align="center">
+<sup><a href="https://www.imdb.com/title/tt3371366/reviews?sort=helpfulnessScore&amp;dir=desc&amp;ratingFilter=0">Transformers: The Last Knight</a>.</sup>
+</div>
+
+<p>The trend is consistent with the IMDb ratings.</p>
+
+<h4 id="sentiment-analysis">Sentiment analysis</h4>
+
+<p>To gain a quantitative sense of the movies’ receptions, I used NLTK’s sentiment analyzer, <a href="http://www.nltk.org/howto/sentiment.html">VADER</a>, to compute a polarity score for the reviews. VADER seems to work best with short, casual contexts like twitter, as discussed <a href="https://groups.google.com/forum/#!topic/nltk-users/_bcbzkqWt10">here</a>, so I used the review titles as corpus.</p>
+
+<h5 id="pre-processing-1">Pre-processing</h5>
+
+<p>We start by importing the necessary modules.</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">nltk.sentiment.vader</span> <span class="kn">import</span> <span class="n">SentimentIntensityAnalyzer</span>
+<span class="kn">from</span> <span class="nn">nltk.tokenize</span> <span class="kn">import</span> <span class="n">sent_tokenize</span>
+<span class="n">nltk</span><span class="p">.</span><span class="n">download</span><span class="p">(</span><span class="s">'vader_lexicon'</span><span class="p">)</span>
+</code></pre></div></div>
+<p>Since sentences are now the units of analysis, we tokenize the review titles into sentences.</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># tokenize into sentences
+</span><span class="n">tokenizedSents</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">.</span><span class="n">index</span><span class="p">)):</span>
+    <span class="n">review</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s">'title'</span><span class="p">][</span><span class="n">i</span><span class="p">]</span>
+    <span class="n">tokenizedSent</span> <span class="o">=</span> <span class="n">sent_tokenize</span><span class="p">(</span><span class="n">review</span><span class="p">)</span>
+    <span class="n">tokenizedSents</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">tokenizedSent</span><span class="p">)</span>
+
+<span class="c1"># merge list of lists into one list
+</span><span class="n">sents</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">tokenizedSent</span> <span class="ow">in</span> <span class="n">tokenizedSents</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">sent</span> <span class="ow">in</span> <span class="n">tokenizedSent</span><span class="p">:</span>
+        <span class="n">sents</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">sent</span><span class="p">)</span>
+</code></pre></div></div>
+<p>The sentiment analyzer calculates a polarity score with 4 components, namely tendency towards negativity, positivity, neutrality, and overall tendency.</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># polarity scores
+</span><span class="n">neg</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">neu</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">pos</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">compound</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">sia</span> <span class="o">=</span> <span class="n">SentimentIntensityAnalyzer</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">sent</span> <span class="ow">in</span> <span class="n">sents</span><span class="p">:</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">sent</span><span class="p">)</span>
+    <span class="n">ps</span> <span class="o">=</span> <span class="n">sia</span><span class="p">.</span><span class="n">polarity_scores</span><span class="p">(</span><span class="n">sent</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">ps</span><span class="p">)</span>
+    <span class="n">neg</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">ps</span><span class="p">[</span><span class="s">"neg"</span><span class="p">])</span>
+    <span class="n">neu</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">ps</span><span class="p">[</span><span class="s">"neu"</span><span class="p">])</span>
+    <span class="n">pos</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">ps</span><span class="p">[</span><span class="s">"pos"</span><span class="p">])</span>
+    <span class="n">compound</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">ps</span><span class="p">[</span><span class="s">"compound"</span><span class="p">])</span>
+<span class="n">scores</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s">'negative'</span><span class="p">:</span> <span class="n">neg</span><span class="p">,</span> <span class="s">'neutral'</span><span class="p">:</span> <span class="n">neu</span><span class="p">,</span> <span class="s">'positive'</span><span class="p">:</span> <span class="n">pos</span><span class="p">,</span> <span class="s">'compound'</span><span class="p">:</span> <span class="n">compound</span><span class="p">},</span> <span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s">'negative'</span><span class="p">,</span> <span class="s">'neutral'</span><span class="p">,</span> <span class="s">'positive'</span><span class="p">,</span> <span class="s">'compound'</span><span class="p">])</span>
+</code></pre></div></div>
+<p>Polarity scores for some titles are shown below. The analyzer does not pick up the more layered sentiments, but overall, it seems to be doing ok.</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> Another Hollywood title destroyed by Chinese money
+{'neg': 0.348, 'neu': 0.652, 'pos': 0.0, 'compound': -0.4939}
+ Best Transformers so far
+{'neg': 0.0, 'neu': 0.417, 'pos': 0.583, 'compound': 0.6369}
+ IMDB's ratings are now a joke
+{'neg': 0.0, 'neu': 0.645, 'pos': 0.355, 'compound': 0.296}
+ Bad writing
+{'neg': 0.778, 'neu': 0.222, 'pos': 0.0, 'compound': -0.5423}
+ Lame
+{'neg': 1.0, 'neu': 0.0, 'pos': 0.0, 'compound': -0.4215}
+ Rather watch Zoolader sequel than this!!!
+{'neg': 0.0, 'neu': 1.0, 'pos': 0.0, 'compound': 0.0}
+!
+{'neg': 0.0, 'neu': 0.0, 'pos': 0.0, 'compound': 0.0}
+ Boring, predictable and stupid
+{'neg': 0.74, 'neu': 0.26, 'pos': 0.0, 'compound': -0.6908}
+ Very bland
+{'neg': 0.0, 'neu': 1.0, 'pos': 0.0, 'compound': 0.0}
+ Teen drama with terrible acting and plot holes
+{'neg': 0.307, 'neu': 0.693, 'pos': 0.0, 'compound': -0.4767}
+ Story don't line up with the other movies
+{'neg': 0.0, 'neu': 1.0, 'pos': 0.0, 'compound': 0.0}
+ Fast forward through the scenas
+{'neg': 0.0, 'neu': 1.0, 'pos': 0.0, 'compound': 0.0}
+ What a waste of money!!
+{'neg': 0.53, 'neu': 0.47, 'pos': 0.0, 'compound': -0.5242}
+</code></pre></div></div>
+
+<h5 id="result-1">Result</h5>
+
+<p>Histograms of the polarity scores (compound) for the review titles of the 8 movies are shown below.</p>
+
+<div style="text-align: center"><img src="/images/G1_polarity_scores.png" width="600px" /></div>
+<div align="center">
+<sup><a href="https://www.imdb.com/title/tt0086817/reviews?sort=helpfulnessScore&amp;dir=desc&amp;ratingFilter=0">G1</a>.</sup>
+</div>
+
+<div style="text-align: center"><img src="/images/G1_The_Movie_polarity_scores.png" width="600px" /></div>
+<div align="center">
+<sup><a href="https://www.imdb.com/title/tt0092106/reviews?sort=helpfulnessScore&amp;dir=desc&amp;ratingFilter=0">G1 The Movie</a>.</sup>
+</div>
+
+<div style="text-align: center"><img src="/images/TF1_polarity_scores.png" width="600px" /></div>
+<div align="center">
+<sup><a href="https://www.imdb.com/title/tt0418279/reviews?sort=helpfulnessScore&amp;dir=desc&amp;ratingFilter=0">Transformers (2007)</a>.</sup>
+</div>
+
+<div style="text-align: center"><img src="/images/TF2_polarity_scores.png" width="600px" /></div>
+<div align="center">
+<sup><a href="https://www.imdb.com/title/tt1055369/reviews?sort=helpfulnessScore&amp;dir=desc&amp;ratingFilter=0">Transformers: Revenge of the Fallen</a>.</sup>
+</div>
+
+<div style="text-align: center"><img src="/images/TF3_polarity_scores.png" width="600px" /></div>
+<div align="center">
+<sup><a href="https://www.imdb.com/title/tt1399103/reviews?sort=helpfulnessScore&amp;dir=desc&amp;ratingFilter=0">Transformers: Dark of the Moon</a>.</sup>
+</div>
+
+<div style="text-align: center"><img src="/images/TF4_polarity_scores.png" width="600px" /></div>
+<div align="center">
+<sup><a href="https://www.imdb.com/title/tt2109248/reviews?sort=helpfulnessScore&amp;dir=desc&amp;ratingFilter=0">Transformers: Age of Extinction</a>.</sup>
+</div>
+
+<div style="text-align: center"><img src="/images/TF5_polarity_scores.png" width="600px" /></div>
+<div align="center">
+<sup><a href="https://www.imdb.com/title/tt3371366/reviews?sort=helpfulnessScore&amp;dir=desc&amp;ratingFilter=0">Transformers: The Last Knight</a>.</sup>
+</div>
+
+<div style="text-align: center"><img src="/images/BBB_polarity_scores.png" width="600px" /></div>
+<div align="center">
+<sup><a href="https://www.imdb.com/title/tt4701182/reviews?sort=helpfulnessScore&amp;dir=desc&amp;ratingFilter=0">Bumblebee</a>.</sup>
+</div>
+
+<p>Most sentences are recognized as neutral, yet the trend of negative and positive tendencies seems to agree with the word clouds.</p>
+:ET

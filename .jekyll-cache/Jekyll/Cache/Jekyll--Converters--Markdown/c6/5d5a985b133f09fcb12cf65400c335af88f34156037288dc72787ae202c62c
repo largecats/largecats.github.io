@@ -1,0 +1,10 @@
+I"±<ul id="markdown-toc">
+  <li><a href="#problem" id="markdown-toc-problem">Problem</a></li>
+</ul>
+
+<p>This post refers to <a href="https://largecats.github.io/2019/06/17/Build-blog/">how this particular blog site is configured</a>.</p>
+
+<h2 id="problem">Problem</h2>
+
+<p>I got a <code class="language-plaintext highlighter-rouge">Error: Validation Failed with status code 500</code> Gitalk error after publishing a new blog post.</p>
+:ET

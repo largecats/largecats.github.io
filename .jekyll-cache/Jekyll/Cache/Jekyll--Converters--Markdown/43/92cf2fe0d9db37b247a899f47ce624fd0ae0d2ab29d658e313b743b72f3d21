@@ -1,0 +1,195 @@
+I"8<ul id="markdown-toc">
+  <li><a href="#motivation" id="markdown-toc-motivation">Motivation</a></li>
+  <li><a href="#preparation" id="markdown-toc-preparation">Preparation</a></li>
+  <li><a href="#method" id="markdown-toc-method">Method</a></li>
+</ul>
+
+<h2 id="motivation">Motivation</h2>
+<p>I wanted to set up a technical blog free of charge. A quick search on the world wide web shows that building technical blog using GitHub Pages seems to be a popular option. This post demonstrates how this blog site was built on Windows using GitHub Pages, Jekyll, and Gitalk.</p>
+
+<h2 id="preparation">Preparation</h2>
+
+<p>I have used GitHub before but know very little about web development. This post should be suitable for readers with a similar background.</p>
+
+<h2 id="method">Method</h2>
+
+<p>This blog is essentially a GitHub repository, where some of the repository’s features are transformed via GitHub Pages, Jekyll, and Gitalk to become features of a blog site. <a href="https://pages.github.com/">GitHub Pages</a> is a static site hosting service that can host webpages from a GitHub repository. <a href="https://jekyllrb.com/">Jekyll</a> is a static site generator that, when used with GitHub Pages, serves to update all the pages on the blog every time a commit to the associated repository is made. <a href="https://github.com/gitalk/gitalk">Gitalk</a> is a comment plugin based on the “Issues” section of GitHub repositories.</p>
+
+<p><strong>1. Create a repository</strong></p>
+
+<p>Create a GitHub repository and name it using the format <code class="language-plaintext highlighter-rouge">username.github.io</code>.</p>
+
+<p>E.g., if username is <code class="language-plaintext highlighter-rouge">steve-rogers</code>, the repository name should be <code class="language-plaintext highlighter-rouge">steve-rogers.github.io</code>.</p>
+
+<p><strong>2. Set up GitHub Pages</strong></p>
+
+<p>On the repository page, go to “Settings” and then “GitHub Pages”. Choose a theme and follow the instructions. When done, the GitHub Pages should be published at <code class="language-plaintext highlighter-rouge">https://username.github.io/</code> (e.g., <code class="language-plaintext highlighter-rouge">https://steve-rogers.github.io/</code>). This is also the url of the blog site to be built.</p>
+
+<p><strong>3. Clone the repository locally</strong></p>
+
+<p>Clone the repository to a local folder.</p>
+
+<p>The next two steps enable launching the blog site for local preview (shown in step 10) before pushing it to GitHub.</p>
+
+<p><strong>4. Install Ruby</strong></p>
+
+<p>Download and install Ruby with devkit <a href="https://rubyinstaller.org/downloads/">here</a>.</p>
+
+<p><strong>5. Install Jekyll</strong></p>
+
+<p>Open cmd. Type <code class="language-plaintext highlighter-rouge">gem install jekyll</code>.</p>
+
+<p>E.g.,</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>C:\Users\steve&gt; gem install jekyll
+</code></pre></div></div>
+
+<p>When the installation is done, type <code class="language-plaintext highlighter-rouge">jekyll -v</code> in the cmd; if the jekyll version shows up, the installation is successful. E.g.,</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>C:\Users\steve&gt; jekyll -v
+jekyll 3.8.5
+</code></pre></div></div>
+
+<p><strong>6. Download a Jekyll theme</strong></p>
+
+<ol>
+  <li>
+    <p>Choose a jekyll theme from <a href="http://jekyllthemes.org/">here</a> and download it.</p>
+
+    <p>To download the theme, one may click “Download” directly, or click “Home” to go to the GitHub page of the theme and download the theme’s repository from there. The latter option provides the latest version of the theme.</p>
+
+    <p>This blog uses the <a href="http://jekyllthemes.org/themes/cool-concise-high-end/">Cool Concise High-end theme</a>; its latest version is <a href="https://github.com/Gaohaoyang/gaohaoyang.github.io">here</a>.</p>
+  </li>
+  <li>Go back to the local repository created in step 2 and delete all files except for the hidden <code class="language-plaintext highlighter-rouge">.git</code> folder.</li>
+  <li>Copy all files from the jekyll theme folder just downloaded to the local repository.</li>
+</ol>
+
+<p>At this step, if one follows step 10 and launches the blog site locally, the blog site would look the same as the jekyll theme demo if they downloaded the theme from the jekyll theme website, or the blog of the theme owner if they downloaded the theme from the owner’s repository.</p>
+
+<p><strong>7. Customize theme parameters</strong></p>
+
+<p>The jekyll theme is like a blog site template. One may customize the template by filling in their own user information, such as blog title, GitHub username, and email address in the blog site’s main page, header, footer, etc.</p>
+
+<p><strong>8. Set up Gitalk</strong></p>
+
+<p>The theme template this blog uses has a comment feature that uses Disqus. I modified the template to use Gitalk instead. Here’s how to do it.</p>
+
+<ol>
+  <li>
+    <p>Register an OAuth application <a href="https://github.com/settings/applications/new">here</a>.</p>
+
+    <p>“Application name” is the name of the blog site’s GitHub repository. “Homepage URL” is the url of the blog site. “Authorization callback URL” is the same as “Homepage URL”. E.g.,</p>
+
+    <div style="text-align: center"><img src="/images/OAuth-application.png" width="450px" /></div>
+
+    <p>Note down the client id and the client secret key.</p>
+  </li>
+  <li>
+    <p>Paste the following code at the end of the pages where the comment sections are to be placed (if necessary, comment out all the Disqus containers first). Then customize the Gitalk parameters by filling in one’s own information.</p>
+    <div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="c">&lt;!-- Gitalk comment start  --&gt;</span>
+
+ <span class="c">&lt;!-- Link Gitalk  --&gt;</span>
+ <span class="nt">&lt;link</span> <span class="na">rel=</span><span class="s">"stylesheet"</span> <span class="na">href=</span><span class="s">"https://unpkg.com/gitalk/dist/gitalk.css"</span><span class="nt">&gt;</span>
+ <span class="nt">&lt;script </span><span class="na">src=</span><span class="s">"https://unpkg.com/gitalk@latest/dist/gitalk.min.js"</span><span class="nt">&gt;&lt;/script&gt;</span> 
+ <span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">"gitalk-container"</span><span class="nt">&gt;&lt;/div&gt;</span>     <span class="nt">&lt;script </span><span class="na">type=</span><span class="s">"text/javascript"</span><span class="nt">&gt;</span>
+     <span class="kd">var</span> <span class="nx">gitalk</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Gitalk</span><span class="p">({</span>
+
+     <span class="c1">// Gitalk parameters</span>
+         <span class="na">clientID</span><span class="p">:</span> <span class="dl">'</span><span class="s1">xxxxxxxxxxxxxxxxxxxx</span><span class="dl">'</span><span class="p">,</span> <span class="c1">//customize</span>
+         <span class="na">clientSecret</span><span class="p">:</span> <span class="dl">'</span><span class="s1">xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx</span><span class="dl">'</span><span class="p">,</span> <span class="c1">//customize</span>
+         <span class="na">repo</span><span class="p">:</span> <span class="dl">'</span><span class="s1">steve-rogers.github.io</span><span class="dl">'</span><span class="p">,</span> <span class="c1">//customize</span>
+         <span class="na">owner</span><span class="p">:</span> <span class="dl">'</span><span class="s1">steve-rogers</span><span class="dl">'</span><span class="p">,</span> <span class="c1">//customize</span>
+         <span class="na">admin</span><span class="p">:</span> <span class="p">[</span><span class="dl">'</span><span class="s1">steve-rogers</span><span class="dl">'</span><span class="p">],</span> <span class="c1">//customize</span>
+         <span class="na">id</span><span class="p">:</span> <span class="nb">window</span><span class="p">.</span><span class="nx">location</span><span class="p">.</span><span class="nx">pathname</span><span class="p">,</span> <span class="c1">// leave this line as it is</span>
+        
+     <span class="p">});</span>
+     <span class="nx">gitalk</span><span class="p">.</span><span class="nx">render</span><span class="p">(</span><span class="dl">'</span><span class="s1">gitalk-container</span><span class="dl">'</span><span class="p">);</span>
+ <span class="nt">&lt;/script&gt;</span> 
+ <span class="c">&lt;!-- Gitalk end --&gt;</span>
+</code></pre></div>    </div>
+
+    <p>E.g., I wanted to put a comment section at the end of each post and the “Archives” page. So I pasted the above code at the end of <code class="language-plaintext highlighter-rouge">/_layouts/post.html</code> and <code class="language-plaintext highlighter-rouge">/page/0archives.html</code>.</p>
+  </li>
+</ol>
+
+<p>To view the resulting comment sections at this step:</p>
+<ol>
+  <li>
+    <p>Follow step 11 to push to GitHub.</p>
+
+    <p><strong>Caveat.</strong> If the blog site is launched locally (as in step 10) without first being pushed to Github, a message like</p>
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> Related Issues not found.
+ Please contact @username to initialize comment.
+ Login with Github
+</code></pre></div>    </div>
+    <p>would appear at the comment sections, and clicking on “Login with Github” would navigate back to the blog site at <code class="language-plaintext highlighter-rouge">https://username.github.io</code>.</p>
+  </li>
+  <li>Wait for 30s and visit the blog site at <code class="language-plaintext highlighter-rouge">https://username.github.io/</code>.</li>
+  <li>
+    <p>Open each page with a comment section and click on “Login with GitHub” at the comment section to initialize issue comment. If this is the first time a comment is ever initialized at the blog site, a prompt for authentication may appear. Otherwise, it seems that opening the pages is enough.</p>
+
+    <p>This creates an issue for each page with a comment section at the blog’s GitHub repository. Any future comments on a page would become comments under the corresponding issue in the repository.</p>
+  </li>
+</ol>
+
+<p><strong>Caveat.</strong> The blog posts are generated from <code class="language-plaintext highlighter-rouge">.md</code> files in the <code class="language-plaintext highlighter-rouge">_posts</code> folder in the repository. The names of these <code class="language-plaintext highlighter-rouge">.md</code> files cannot be longer than 50 characters, otherwise an <code class="language-plaintext highlighter-rouge">Error: Validation Failed</code> error would occur at the comment sections. The reason is follows.</p>
+
+<p>Each blog post is a page, and as Gitalk creates an issue for each page, the names of those <code class="language-plaintext highlighter-rouge">.md</code> files would become labels of the corresponding issues. E.g., this blog post is written in a <code class="language-plaintext highlighter-rouge">.md</code> file called <code class="language-plaintext highlighter-rouge">2019-06-17-Build-blog.md</code>, and the corresponding issue has labels <code class="language-plaintext highlighter-rouge">/2019/06/17/Build-blog</code> and <code class="language-plaintext highlighter-rouge">Gitalk</code>, as shown below.</p>
+
+<p><img src="/images/Gitalk-issue.png" alt="" width="800px" /></p>
+
+<p>And 50 characters is the limit of GitHub issue label, as discussed <a href="https://github.com/gitalk/gitalk/issues/115">here</a>.</p>
+
+<p><strong>9. Write blog</strong></p>
+
+<p>As mentioned above, each blog post is generated from <code class="language-plaintext highlighter-rouge">.md</code> files in the <code class="language-plaintext highlighter-rouge">_posts</code> folder in the repository, with a header that looks something like this:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>---
+layout: post
+title:  "Build blog with GitHub Pages, Jekyll, and Gitalk"
+date:   2019-06-17
+categories: life-saver
+tags: github-pages jekyll gitalk windows
+---
+
+* content
+{:toc}
+</code></pre></div></div>
+
+<p>Customize this header for each post. The rest is the same as writing in markdown.</p>
+
+<p><strong>10. Local preview</strong></p>
+
+<p>It is generally a good idea to preview the blog post before pushing it to GitHub, which would publish it at <code class="language-plaintext highlighter-rouge">https://username.github.io/</code>. Here’s how to do it.</p>
+
+<ol>
+  <li>Open cmd.</li>
+  <li><code class="language-plaintext highlighter-rouge">cd</code> to the local repository.</li>
+  <li>
+    <p>Type <code class="language-plaintext highlighter-rouge">jekyll s</code>.</p>
+
+    <p>The output would look something like this:</p>
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> C:\Users\steve\blog&gt;jekyll s
+ Configuration file: C:/Users/steve/blog/_config.yml
+     Deprecation: The 'gems' configuration option has been renamed to 'plugins'. Please update your config file accordingly.
+             Source: C:/Users/steve/blog
+     Destination: C:/Users/steve/blog/_site
+ Incremental build: disabled. Enable with --incremental
+     Generating...
+                     done in 2.05 seconds.
+ Please add the following to your Gemfile to avoid polling for changes:
+     gem 'wdm', '&gt;= 0.1.0' if Gem.win_platform?
+ Auto-regeneration: enabled for 'C:/Users/steve/blog'
+     Server address: http://127.0.0.1:4000/
+ Server running... press ctrl-c to stop.
+</code></pre></div>    </div>
+  </li>
+  <li>Type <code class="language-plaintext highlighter-rouge">localhost:4000</code> in browser to view the blog site locally.</li>
+</ol>
+
+<p>If changes are made, save the changes and refresh the browser to view the updated blog site locally.</p>
+
+<p><strong>11. Push to GitHub</strong></p>
+
+<p>When the blog site is ready to be published, push the repository to GitHub. The blog site will be updated at <code class="language-plaintext highlighter-rouge">https://username.github.io/</code> after about 30s.</p>
+:ET

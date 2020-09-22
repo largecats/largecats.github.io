@@ -1,0 +1,121 @@
+I"�:<ul id="markdown-toc">
+  <li><a href="#motivation" id="markdown-toc-motivation">Motivation</a></li>
+  <li><a href="#preparation" id="markdown-toc-preparation">Preparation</a></li>
+  <li><a href="#method" id="markdown-toc-method">Method</a>    <ul>
+      <li><a href="#obtain-a-text-version-of-linkedin-profile" id="markdown-toc-obtain-a-text-version-of-linkedin-profile">Obtain a text version of LinkedIn profile</a></li>
+      <li><a href="#text-processing" id="markdown-toc-text-processing">Text processing</a></li>
+      <li><a href="#generate-wordcloud" id="markdown-toc-generate-wordcloud">Generate wordcloud</a></li>
+    </ul>
+  </li>
+  <li><a href="#result" id="markdown-toc-result">Result</a></li>
+</ul>
+
+<h2 id="motivation">Motivation</h2>
+
+<p>I want a background photo for my LinkedIn account. Generating a wordcloud image from my LinkedIn profile seems a good idea.</p>
+
+<h2 id="preparation">Preparation</h2>
+
+<p>Same as <a href="https://largecats.github.io/2019/06/19/Text-analysis-with-movie-reviews/">this blog post</a>.</p>
+
+<h2 id="method">Method</h2>
+
+<p>All code can be found <a href="https://github.com/largecats/text-analysis/blob/master/wordcloud">here</a>.</p>
+
+<h3 id="obtain-a-text-version-of-linkedin-profile">Obtain a text version of LinkedIn profile</h3>
+
+<p>Copy the relevant LinkedIn profile sections into a <code class="language-plaintext highlighter-rouge">.txt</code> file.</p>
+
+<p>(It would be more convenient to scrape the LinkedIn profile, but LinkedIn has policies against web scraping, see <a href="https://www.quora.com/How-do-I-scrape-LinkedIn">here</a>.)</p>
+
+<h3 id="text-processing">Text processing</h3>
+
+<p>Next, we process the text to prepare for wordcloud generation. This has been discussed in detail <a href="https://largecats.github.io/2019/06/19/Text-analysis-with-movie-reviews/">in another blog post</a>.</p>
+
+<p>First, import the necessary modules.</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">wordcloud</span> <span class="kn">import</span> <span class="n">WordCloud</span><span class="p">,</span> <span class="n">STOPWORDS</span> 
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="n">plt</span> 
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="n">pd</span> 
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">nltk</span>
+</code></pre></div></div>
+<p>Then, read in the text file.</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># set working directory
+</span><span class="n">path</span> <span class="o">=</span> <span class="s">""</span>
+<span class="n">os</span><span class="p">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+
+<span class="n">fileName</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="s">"Please enter text file name: "</span><span class="p">)</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">fileName</span><span class="p">,</span> <span class="s">'r'</span><span class="p">)</span> <span class="k">as</span> <span class="nb">file</span><span class="p">:</span>
+    <span class="n">text</span> <span class="o">=</span> <span class="nb">file</span><span class="p">.</span><span class="n">read</span><span class="p">().</span><span class="n">replace</span><span class="p">(</span><span class="s">'</span><span class="se">\n</span><span class="s">'</span><span class="p">,</span> <span class="s">' '</span><span class="p">)</span>
+
+<span class="k">print</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+</code></pre></div></div>
+<p>Using sample text file <code class="language-plaintext highlighter-rouge">text.txt</code> containing the first two paragraphs of <a href="https://en.wikipedia.org/wiki/Python_(programming_language)">Python’s wikipedia page</a>, the output is as follows.</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Please enter text file name: text.txt
+Python is an interpreted, high-level, general-purpose programming language. Created by Guido van Rossum and first released in 1991, Python's design philosophy emphasizes code readability with its notable use of significant whitespace. Its language constructs and object-oriented approach aim to help programmers write clear, logical code for small and large-scale projects.  Python is dynamically typed and garbage-collected. It supports multiple programming paradigms, including procedural, object-oriented, and functional programming. Python is often described as a "batteries included" language due to its comprehensive standard library.  Python was conceived in the late 1980s as a successor to the ABC language. Python 2.0, released 2000, introduced features like list comprehensions and a garbage collection system capable of collecting reference cycles. Python 3.0, released 2008, was a major revision of the language that is not completely backward-compatible, and much Python 2 code does not run unmodified on Python 3. Due to concern about the amount of code written for Python 2, support for Python 2.7 (the last release in the 2.x series) was extended to 2020. Language developer Guido van Rossum shouldered sole responsibility for the project until July 2018 but now shares his leadership as a member of a five-person steering council.  Python interpreters are available for many operating systems. A global community of programmers develops and maintains CPython, an open source[32] reference implementation. A non-profit organization, the Python Software Foundation, manages and directs resources for Python and CPython development.
+</code></pre></div></div>
+<p>For convenience, we convert the text into lowercase. We then define a set of <code class="language-plaintext highlighter-rouge">stopwords</code> that are to be ignored in the wordcloud. <code class="language-plaintext highlighter-rouge">STOPWORDS</code> comes with the <code class="language-plaintext highlighter-rouge">wordcloud</code> module, we can add custom stopwords via the <code class="language-plaintext highlighter-rouge">update()</code> method of <code class="language-plaintext highlighter-rouge">set</code>.</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># turn to lowercase
+</span><span class="n">text</span> <span class="o">=</span> <span class="n">text</span><span class="p">.</span><span class="n">lower</span><span class="p">()</span>
+
+<span class="c1"># define words that are to be ignored in the word cloud
+</span><span class="n">stopwords</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">STOPWORDS</span><span class="p">)</span>
+<span class="c1"># stopwords.update(["project", 'use', 'hospital', 'bi', 'diagnosis'])
+</span></code></pre></div></div>
+<p>Then, we tokenize the text into a list of individual words. To normalize these words for the wordcloud, we tag them with their part-of-speech (e.g., verb, noun) and convert the words back to their original form based on these tags. E.g., “databases” becomes “database”, “developed” becomes “develop”. Finally, we merge these lemmatized words into a string, which is to be fed to the word cloud generator.</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># tokenize into words
+</span><span class="kn">from</span> <span class="nn">nltk.tokenize</span> <span class="kn">import</span> <span class="n">word_tokenize</span>
+<span class="n">words</span> <span class="o">=</span> <span class="n">word_tokenize</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+
+<span class="c1"># pos tagging
+</span><span class="n">tags</span> <span class="o">=</span> <span class="n">nltk</span><span class="p">.</span><span class="n">pos_tag</span><span class="p">(</span><span class="n">words</span><span class="p">)</span>
+
+<span class="c1"># lemmatization
+</span><span class="kn">from</span> <span class="nn">nltk.stem.wordnet</span> <span class="kn">import</span> <span class="n">WordNetLemmatizer</span>
+<span class="n">lem</span> <span class="o">=</span> <span class="n">WordNetLemmatizer</span><span class="p">()</span>
+<span class="n">lemWords</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">words</span><span class="p">)):</span>
+    <span class="n">word</span> <span class="o">=</span> <span class="n">words</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+    <span class="n">tag</span> <span class="o">=</span> <span class="n">tags</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">if</span> <span class="s">'VB'</span> <span class="ow">in</span> <span class="n">tag</span><span class="p">:</span>
+        <span class="n">lemWord</span> <span class="o">=</span> <span class="n">lem</span><span class="p">.</span><span class="n">lemmatize</span><span class="p">(</span><span class="n">word</span><span class="p">,</span> <span class="s">"v"</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">tag</span> <span class="o">==</span> <span class="s">"PRP"</span><span class="p">:</span>
+        <span class="n">lemWord</span> <span class="o">=</span> <span class="n">word</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">lemWord</span> <span class="o">=</span> <span class="n">lem</span><span class="p">.</span><span class="n">lemmatize</span><span class="p">(</span><span class="n">word</span><span class="p">)</span>
+    <span class="n">lemWords</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">lemWord</span><span class="p">)</span>
+
+<span class="n">finalText</span> <span class="o">=</span> <span class="s">' '</span><span class="p">.</span><span class="n">join</span><span class="p">(</span><span class="n">lemWords</span><span class="p">)</span>
+</code></pre></div></div>
+
+<h3 id="generate-wordcloud">Generate wordcloud</h3>
+<p>The recommended size for the LinkedIn background photo is 1584x396 px, so that is the size of our word cloud. The remaining code is taken from <a href="https://amueller.github.io/word_cloud/auto_examples/a_new_hope.html">the documentation for the word cloud module</a>.</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># linkedin background photo size is 1564x396
+</span><span class="n">wordcloud</span> <span class="o">=</span> <span class="n">WordCloud</span><span class="p">(</span><span class="n">width</span> <span class="o">=</span> <span class="mi">1584</span><span class="p">,</span> <span class="n">height</span> <span class="o">=</span> <span class="mi">396</span><span class="p">,</span> 
+                <span class="n">background_color</span> <span class="o">=</span><span class="s">'black'</span><span class="p">,</span>
+                <span class="n">min_font_size</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span>
+                <span class="n">stopwords</span> <span class="o">=</span> <span class="n">stopwords</span><span class="p">,</span>
+                <span class="n">random_state</span> <span class="o">=</span> <span class="mi">42</span><span class="p">).</span><span class="n">generate</span><span class="p">(</span><span class="n">finalText</span><span class="p">)</span> 
+
+<span class="c1"># for grey scale
+</span><span class="k">def</span> <span class="nf">grey_color_func</span><span class="p">(</span><span class="n">word</span><span class="p">,</span> <span class="n">font_size</span><span class="p">,</span> <span class="n">position</span><span class="p">,</span> <span class="n">orientation</span><span class="p">,</span> <span class="n">random_state</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">return</span> <span class="s">"hsl(0, 0%%, %d%%)"</span> <span class="o">%</span> <span class="n">random</span><span class="p">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">60</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+
+<span class="c1"># plot the wordcloud image
+</span><span class="n">plt</span><span class="p">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span> <span class="o">=</span> <span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="n">facecolor</span> <span class="o">=</span> <span class="bp">None</span><span class="p">)</span> 
+<span class="n">plt</span><span class="p">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">wordcloud</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">wordcloud</span><span class="p">.</span><span class="n">recolor</span><span class="p">(</span><span class="n">color_func</span> <span class="o">=</span> <span class="n">grey_color_func</span><span class="p">,</span> <span class="n">random_state</span> <span class="o">=</span> <span class="mi">3</span><span class="p">),</span> <span class="n">interpolation</span> <span class="o">=</span> <span class="s">"bilinear"</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">axis</span><span class="p">(</span><span class="s">"off"</span><span class="p">)</span> 
+<span class="n">plt</span><span class="p">.</span><span class="n">tight_layout</span><span class="p">(</span><span class="n">pad</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> 
+<span class="n">plt</span><span class="p">.</span><span class="n">savefig</span><span class="p">(</span><span class="s">"wordcloud.png"</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+</code></pre></div></div>
+
+<h2 id="result">Result</h2>
+
+<p><img src="/images/wordcloud.png" alt="" width="800px" /></p>
+<div align="center">
+<sup>Word cloud of sample text.</sup>
+</div>
+:ET

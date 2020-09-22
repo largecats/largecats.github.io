@@ -1,0 +1,13 @@
+I"ç<ul id="markdown-toc">
+  <li><a href="#motivation" id="markdown-toc-motivation">Motivation</a></li>
+  <li><a href="#preparation" id="markdown-toc-preparation">Preparation</a></li>
+</ul>
+
+<h2 id="motivation">Motivation</h2>
+
+<p>I wanted to turn a list of addresses into coordinates and display them on a map widget.</p>
+
+<h2 id="preparation">Preparation</h2>
+
+<p>I read <a href="https://developers.google.com/maps/documentation/embed/get-api-key">Google Mapâ€™s guide on API key</a>.</p>
+:ET

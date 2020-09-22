@@ -1,0 +1,36 @@
+I"\<head>
+    <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script>
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({
+            tex2jax: {
+            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+            inlineMath: [['$','$']]
+            }
+        });
+    </script>
+</head>
+<ul id="markdown-toc">
+  <li><a href="#motivation" id="markdown-toc-motivation">Motivation</a></li>
+</ul>
+
+<h1 id="motivation">Motivation</h1>
+
+<p>Spark has 2 deployment modes, client mode and cluster mode. Cluster mode is ideal for batch ETL jobs submitted via the same “driver server” because the driver programs are run on the cluster instead of the driver server, thereby preventing the driver server from becoming the resource bottleneck. But in cluster mode, the driver server is only responsible for running a client process that submits the application, and the driver program is run on another machine in the cluster. This poses the following challenges:</p>
+
+<ol>
+  <li>We can’t access the driver program’s log from the driver server (only the client process’ log is available to the driver server).</li>
+  <li>We can’t terminate the spark application via Ctrl-C or by marking success/killing tasks in the Airflow scheduler (doing so will only kill the client process running on the driver server, not the spark application itself).</li>
+</ol>
+
+<div style="text-align: center"><img src="/images/cluster_mode-Page-1.png" width="600px" /></div>
+<div align="center">
+</div>
+
+<p>We want to make use of cluster mode’s advantage in terms of resource and find workarounds to:</p>
+
+<ol>
+  <li>Access and store logs for recent as well as historical jobs conveniently;</li>
+  <li>View log conveniently in real time;</li>
+  <li>Kill applications via keyboard or Airflow.</li>
+</ol>
+:ET

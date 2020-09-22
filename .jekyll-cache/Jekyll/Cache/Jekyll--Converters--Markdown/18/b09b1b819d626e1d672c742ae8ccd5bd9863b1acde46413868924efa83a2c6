@@ -1,0 +1,94 @@
+I"?%<ul id="markdown-toc">
+  <li><a href="#motivation" id="markdown-toc-motivation">Motivation</a></li>
+  <li><a href="#preparation" id="markdown-toc-preparation">Preparation</a></li>
+  <li><a href="#method" id="markdown-toc-method">Method</a></li>
+  <li><a href="#result" id="markdown-toc-result">Result</a></li>
+</ul>
+
+<h2 id="motivation">Motivation</h2>
+
+<p>I wanted to turn a list of addresses into coordinates and display them on a map widget.</p>
+
+<h2 id="preparation">Preparation</h2>
+
+<p>I read <a href="https://developers.google.com/maps/documentation/embed/get-api-key">Google Map’s guide on API key</a>.</p>
+
+<h2 id="method">Method</h2>
+<p>First, create a Google Map API key following the above guide.</p>
+
+<p>Then, import the necessary modules.</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="n">pd</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="n">np</span>
+<span class="kn">import</span> <span class="nn">csv</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">from</span> <span class="nn">time</span> <span class="kn">import</span> <span class="n">sleep</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">googlemaps</span>
+<span class="kn">import</span> <span class="nn">os</span>
+</code></pre></div></div>
+<p>Read in the list of addresses from a <code class="language-plaintext highlighter-rouge">.csv</code> file and set up the geolocator using the API key created beforehand.</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># set working directory
+</span><span class="n">path</span> <span class="o">=</span> <span class="s">""</span>
+<span class="n">os</span><span class="p">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+<span class="n">API_key</span> <span class="o">=</span> <span class="s">""</span>
+<span class="n">inputFileName</span> <span class="o">=</span> <span class="s">"addresses.csv"</span>
+<span class="n">outputFileName</span> <span class="o">=</span> <span class="s">"coordinates.csv"</span>
+<span class="n">pauseTime</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">]</span>
+
+<span class="c1"># read in addresses
+</span><span class="k">def</span> <span class="nf">read_csv_into_list</span><span class="p">(</span><span class="n">fileName</span><span class="p">):</span>
+  <span class="n">data</span> <span class="o">=</span> <span class="p">[]</span>
+  <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">fileName</span><span class="p">,</span> <span class="s">'r'</span><span class="p">,</span> <span class="n">encoding</span> <span class="o">=</span> <span class="s">'UTF-8'</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
+      <span class="n">row</span> <span class="o">=</span> <span class="n">row</span><span class="p">.</span><span class="n">strip</span><span class="p">()</span>
+      <span class="n">data</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+      <span class="k">print</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+  <span class="n">data</span><span class="p">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+  <span class="k">return</span> <span class="n">data</span>
+
+<span class="n">addressList</span> <span class="o">=</span> <span class="n">read_csv_into_list</span><span class="p">(</span><span class="n">inputFileName</span><span class="p">)</span>
+
+<span class="c1"># set up locator
+</span><span class="n">geolocator</span> <span class="o">=</span> <span class="n">googlemaps</span><span class="p">.</span><span class="n">Client</span><span class="p">(</span><span class="n">key</span> <span class="o">=</span> <span class="n">API_key</span><span class="p">)</span>
+
+<span class="c1"># set up output file
+</span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">outputFileName</span><span class="p">,</span> <span class="s">'w'</span><span class="p">,</span> <span class="n">encoding</span> <span class="o">=</span> <span class="s">'UTF-8'</span><span class="p">,</span> <span class="n">newline</span> <span class="o">=</span> <span class="s">""</span><span class="p">)</span> <span class="k">as</span> <span class="n">outputFile</span><span class="p">:</span>
+  <span class="n">colNames</span> <span class="o">=</span> <span class="p">[</span><span class="s">'addresses'</span><span class="p">,</span> <span class="s">'coordinates'</span><span class="p">]</span>
+  <span class="n">writer</span> <span class="o">=</span> <span class="n">csv</span><span class="p">.</span><span class="n">writer</span><span class="p">(</span><span class="n">outputFile</span><span class="p">)</span>
+  <span class="n">writer</span><span class="p">.</span><span class="n">writerow</span><span class="p">(</span><span class="n">colNames</span><span class="p">)</span>
+</code></pre></div></div>
+<p>Finally, loop through the list of addresses and obtain the latitude and longtitude for each address.</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">for</span> <span class="n">address</span> <span class="ow">in</span> <span class="n">addressList</span><span class="p">:</span>
+  <span class="c1"># pause the loop for a random amount of time
+</span>  <span class="n">sleep</span><span class="p">(</span><span class="n">random</span><span class="p">.</span><span class="n">randint</span><span class="p">(</span><span class="n">pauseTime</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">pauseTime</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+  <span class="n">location</span> <span class="o">=</span> <span class="n">geolocator</span><span class="p">.</span><span class="n">geocode</span><span class="p">(</span><span class="n">address</span><span class="p">)</span>
+  <span class="k">try</span><span class="p">:</span>
+    <span class="c1"># record latitude and longitude
+</span>    <span class="n">coordinates</span> <span class="o">=</span> <span class="p">(</span><span class="n">location</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s">'geometry'</span><span class="p">][</span><span class="s">'location'</span><span class="p">][</span><span class="s">'lat'</span><span class="p">],</span> <span class="n">location</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s">'geometry'</span><span class="p">][</span><span class="s">'location'</span><span class="p">][</span><span class="s">'lng'</span><span class="p">])</span>
+  <span class="k">except</span><span class="p">:</span>
+    <span class="n">coordinates</span> <span class="o">=</span> <span class="s">"NA"</span>
+  <span class="k">print</span><span class="p">(</span><span class="n">coordinates</span><span class="p">)</span>
+  <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">outputFileName</span><span class="p">,</span> <span class="s">'w'</span><span class="p">,</span> <span class="n">encoding</span> <span class="o">=</span> <span class="s">'UTF-8'</span><span class="p">,</span> <span class="n">newline</span> <span class="o">=</span> <span class="s">""</span><span class="p">)</span> <span class="k">as</span> <span class="n">outputFile</span><span class="p">:</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="p">[</span><span class="n">address</span><span class="p">,</span> <span class="n">coordinates</span><span class="p">]</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="n">writer</span> <span class="o">=</span> <span class="n">csv</span><span class="p">.</span><span class="n">writer</span><span class="p">(</span><span class="n">outputFile</span><span class="p">)</span>
+    <span class="n">writer</span><span class="p">.</span><span class="n">writerow</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+</code></pre></div></div>
+
+<h2 id="result">Result</h2>
+
+<p>Consider the sample input file <code class="language-plaintext highlighter-rouge">address.csv</code> shown below,</p>
+
+<p><img src="/images/addresses.png" alt="" width="800px" /></p>
+<div align="center">
+<sup>List of addresses.</sup>
+</div>
+
+<p>we obtain the output file <code class="language-plaintext highlighter-rouge">coordinates.csv</code> shown below.</p>
+
+<p><img src="/images/coordinates.png" alt="" width="800px" /></p>
+<div align="center">
+<sup>List of addresses together with latitude and longitude obtained via the geolocator.</sup>
+</div>
+:ET

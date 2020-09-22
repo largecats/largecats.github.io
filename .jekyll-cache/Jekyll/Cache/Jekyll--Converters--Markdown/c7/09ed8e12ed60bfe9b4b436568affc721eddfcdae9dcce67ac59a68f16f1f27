@@ -1,0 +1,31 @@
+I"ä<ul id="markdown-toc">
+  <li><a href="#motivation" id="markdown-toc-motivation">Motivation</a></li>
+  <li><a href="#preparation" id="markdown-toc-preparation">Preparation</a></li>
+  <li><a href="#method" id="markdown-toc-method">Method</a></li>
+</ul>
+
+<h2 id="motivation">Motivation</h2>
+
+<p>I want to install Scala on my PC.</p>
+
+<h2 id="preparation">Preparation</h2>
+
+<p>I read <a href="https://docs.scala-lang.org/">Scalaâ€™s documentation</a>.</p>
+
+<h2 id="method">Method</h2>
+
+<ol>
+  <li>Install Java as explained in <a href="https://largecats.github.io/2019/07/31/install-spark-on-windows/">this post</a>.</li>
+  <li>Install Scala (without sbt) from <a href="https://downloads.lightbend.com/scala/2.13.0/scala-2.13.0.msi">here</a>.</li>
+  <li>Create a system variable <code class="language-plaintext highlighter-rouge">SCALA_HOME</code> and set it to the path of the Scala installation.</li>
+  <li>Add <code class="language-plaintext highlighter-rouge">%SCALA_HOME%\jre\bin</code> to path.</li>
+  <li>Open <code class="language-plaintext highlighter-rouge">cmd</code> and type <code class="language-plaintext highlighter-rouge">scala</code>. The output should look something like this.
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> C:\Users\steve-rogers&gt;scala
+ Welcome to Scala 2.13.0 (Java HotSpot(TM) Client VM, Java 1.8.0_221).
+ Type in expressions for evaluation. Or try :help.
+
+ scala&gt;
+</code></pre></div>    </div>
+  </li>
+</ol>
+:ET

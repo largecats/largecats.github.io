@@ -1,0 +1,25 @@
+I"Æ<ul id="markdown-toc">
+  <li><a href="#motivation" id="markdown-toc-motivation">Motivation</a></li>
+  <li><a href="#preparation" id="markdown-toc-preparation">Preparation</a></li>
+  <li><a href="#method" id="markdown-toc-method">Method</a></li>
+  <li><a href="#result" id="markdown-toc-result">Result</a></li>
+</ul>
+
+<h2 id="motivation">Motivation</h2>
+
+<p>I want to use spark via both python and scala with Jupyter notebook without having to import all those modules associated with pyspark. Iâ€™m using Windows.</p>
+
+<h2 id="preparation">Preparation</h2>
+
+<p>This post assumes configurations <a href="https://largecats.github.io/2019/07/31/install-spark-on-windows/">here</a> and <a href="https://largecats.github.io/2019/07/31/set-up-pyspark-with-jupyter-notebook/">here</a>.</p>
+
+<h2 id="method">Method</h2>
+
+<p>I tried a number of kernels in <a href="https://github.com/jupyter/jupyter/wiki/Jupyter-kernels">this list</a>, only <code class="language-plaintext highlighter-rouge">spylon-spark</code> seems to work.</p>
+
+<p>Follow the instructions <a href="https://github.com/Valassis-Digital-Media/spylon-kernel">here</a>.</p>
+
+<h2 id="result">Result</h2>
+
+<p><img src="/images/spylon.png" alt="" width="800px" /></p>
+:ET
