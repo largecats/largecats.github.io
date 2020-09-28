@@ -145,6 +145,7 @@ spark-submit --verbose \
 
 1. Launch the client process via `run`.
 2. Set trap for the interruption signals SIGINT, SIGTERM to kill the application upon receiving termination signals SIGINT (Ctrl-C) and SIGTERM (Airflow mark success/kill).
+   1. Note that Airflow has its own catch and cleanup mechanism for SIGTERM. So unless our Airflow can be customized, marking success/killing tasks on Airflow would not trigger our cleanup mechanism detailed below.
 3. Read the client process' log line by line to extract the applicationId.
 
 ```
