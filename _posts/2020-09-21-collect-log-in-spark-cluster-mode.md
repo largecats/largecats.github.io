@@ -284,13 +284,13 @@ collect_log_helper() {
     echo "Collecting log..."
     output=$(yarn logs -applicationId $applicationId -log_files stdout stderr -am 1 2>&1)
     status=$(yarn application -status $applicationId 2>&1)
-    if [[ "$output" =~ "Can not find" ]] || [[ "$output" =~ "Unable to get" ]] || [[ "$output" =~ "does not exist" ]] # log aggregation not ready yet
+    if [[ "$output" =~ "Can not find" ]] || [[ "$output" =~ "Unable to get" ]] || [[ "$output" =~ "File "+[a-z0-9\/\_]*+"${applicationId} does not exist." ]] # log aggregation not ready yet
     then
         echo "$output"
         if [[ ! "$status" =~ "Log Aggregation Status : SUCCEEDED" ]]
         then
             echo "$status"
-            if [[ "$status" =~ "Log Aggregation Status : NOT_START" ]] || [[ "$status" =~ "Log Aggregation Status : N/A" ]]
+            if [[ "$status" =~ "State : KILLED" && ( "$status" =~ "Log Aggregation Status : NOT_START" || "$status" =~ "Log Aggregation Status : N/A" ) ]]
             then
                 echo "Log aggregation not started. Skipping log collection..." # usually because log is not generated, e.g., application was killed before it started runnning
                 return 0
