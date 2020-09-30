@@ -128,17 +128,15 @@ log4j.logger.Client = INFO, stdout, stderr
 ```
 2. Pass the above log4j.properties file to the `SPARK_SUBMIT_OPTS` of the driver server that runs the client process. This gets the client process' log to be printed to the driver server's console.
 ```
-SPARK_SUBMIT_OPTS="-Dlog4j.debug=true -Dlog4j.configuration=file:///home/xxx/config/log4j.properties" \
-python spark_submit.py \
-spark-submit --verbose \
+SPARK_SUBMIT_OPTS="-Dlog4j.debug=true -Dlog4j.configuration=file://${ROOT}/xxx/config/log4j.properties" \
+spark-submit \
+--queue ${QUEUE} \
 --deploy-mode cluster \
 --master yarn \
---name "My Spark Application $param" \
---conf spark.executor.memoryOverhead=5G \
---conf spark.yarn.maxAppAttempts=1 \
---num-executors 10 \
---py-files /home/xxx/lib.zip,/home/xxx/config.py \ # need to include all files, otherwise the driver program won't be able to find them from the cluster
-/home/xxx/main.py $param
+--name "${sparkAppName}" \
+${sparkConfig} \
+--py-files ${ROOT}/xxx/common.zip,${ROOT}/xxx/${FOLDER_NAME}/${FOLDER_NAME}_config.py,${ROOT}/xxx/${FOLDER_NAME}/${FOLDER_NAME}_logic.py \
+${ROOT}/xxx/xxx/${FOLDER_NAME}/${SCRIPT_NAME}.py ${param}
 ```
 
 **Parse client process log to get applicationId**   
@@ -155,39 +153,55 @@ spark-submit --verbose \
 #!/bin/bash
 
 # constants
-HDFS_DIR="/user/xxx"
-DIR="/home/xxx"
-NAME="my_spark_application"
+if [[ ${USER} =~ "xxx" ]]
+then
+    ROOT_HDFS="/user/xxx"
+    ROOT="/home/xxx"
+    QUEUE="xxx"
+else
+    ROOT_HDFS="/user/${USER}"
+    ROOT="/ldap_home/${USER}"
+    QUEUE="regular"
+fi
 
-# helper functions
-source "$DIR/shell_functions.sh"
+FOLDER_NAME="xxx"
+SCRIPT_NAME="xxx"
 
 # directory to store logs
-LOG_PATH="$DIR/logs/$NAME"
-mkdir -p $LOG_PATH
+LOG_DIR="${ROOT}/logs/${FOLDER_NAME}"
+mkdir -p ${LOG_DIR}
+
+param=${@}
+sparkAppName="XXX - XXX ${param}"
+sparkConfig=$(cat <<-END
+    --num-executors 100 \
+    --conf spark.executor.memoryOverhead=5G \
+    --conf spark.yarn.maxAppAttempts=1
+END
+)
 
 run() {
-    SPARK_SUBMIT_OPTS="-Dlog4j.debug=true -Dlog4j.configuration=file:///home/xxx/config/log4j.properties" \
-    python spark_submit.py \
-    spark-submit --verbose \
+    SPARK_SUBMIT_OPTS="-Dlog4j.debug=true -Dlog4j.configuration=file://${ROOT}/xxx/config/log4j.properties" \
+    spark-submit \
+    --queue ${QUEUE} \
     --deploy-mode cluster \
     --master yarn \
-    --name "My Spark Application $param" \
-    --conf spark.executor.memoryOverhead=5G \
-    --conf spark.yarn.maxAppAttempts=1 \
-    --num-executors 10 \
-    --py-files /home/xxx/lib.zip,/home/xxx/config.py \ # need to include all files, otherwise the driver program won't be able to find them from the cluster
-    /home/xxx/main.py $param
+    --name "${sparkAppName}" \
+    ${sparkConfig} \
+    --py-files ${ROOT}/xxx/common.zip,${ROOT}/xxx/xxx/${FOLDER_NAME}/${FOLDER_NAME}_config.py,${ROOT}/xxx/xxx/${FOLDER_NAME}/${FOLDER_NAME}_logic.py \
+    ${ROOT}/xxx/xxx/${FOLDER_NAME}/${SCRIPT_NAME}.py ${param}
 }
 
+# helper functions
+source "${ROOT}/xxx/common/shell_functions.sh"
+
 # construct name of log file from parameters
-param=${@}
-logFileName=$NAME
+logFileName=${SCRIPT_NAME}
 for arg in ${param[@]}
     do
-        if [[ ! $arg =~ "$HDFS_DIR" ]]
+        if [[ ! $arg =~ "${ROOT_HDFS}" ]]
         then
-            logFileName+="_$arg"
+            logFileName+="_${arg}"
         else
             logFileName+="_${arg//\//-}" # change / to - in path so that the path can appear in the name of the log file
         fi
@@ -196,19 +210,19 @@ for arg in ${param[@]}
 APPLICATION_ID=""
 
 # prepare to kill application via YARN upon receiving SIGINT (Ctrl-C), SIGTERM (Airflow) signals
-trap 'kill_app $APPLICATION_ID' SIGINT SIGTERM # use single quotes to delay variable expansion till when the function is called
+trap 'kill_app ${APPLICATION_ID}' SIGINT SIGTERM # use single quotes to delay variable expansion till when the function is called
 trapExit=$?
 
 # read output of run() line by line to find applicationId
 while read -r line; do
-    echo "$line"
-    if [[ $line =~ "Submitting application application_" ]]
+    echo "${line}"
+    if [[ ${line} =~ "Submitting application application_" ]]
     then
-        APPLICATION_ID=$(echo $line | grep -oP "application_[0-9_]*") # extract applicationId
-        echo "Found applicationId: $APPLICATION_ID, continue running..."
+        APPLICATION_ID=$(echo ${line} | grep -oP "application_[0-9_]*") # extract applicationId
+        echo "Found applicationId: ${APPLICATION_ID}, continue running..."
     fi
 done < <(run 2>&1)
-get_application_status $APPLICATION_ID
+get_application_status ${APPLICATION_ID}
 sparkSubmitExit=$?
 
 ...
@@ -221,12 +235,20 @@ where `shell_functions.sh` include:
 
 #!/bin/bash
 
+...
+
+exit_with_code() {
+    exitCode=$1
+    echo "Exiting with code $exitCode."
+    exit ${exitCode}
+}
+
 kill_app() {
-    echo "Interrupted by keyboard."
+    echo "Received termination signal."
     applicationId=$1
-    if [ $applicationId != "" ]
+    if [[ ${applicationId} != "" ]]
     then
-        yarn application -kill $applicationId
+        yarn application -kill ${applicationId}
         return 1 # still need to collect log, cannot exit yet
     else
         echo "Application not yet submitted. Skipping kill via YARN..."
@@ -236,9 +258,9 @@ kill_app() {
 
 get_application_status() {
     applicationId=$1
-    status=$(yarn application -status $applicationId 2>&1)
-    echo "$status"
-    if [[ "${status}" =~ "Final-State : SUCCEEDED" ]]
+    status=$(yarn application -status ${applicationId} 2>&1)
+    echo "${status}"
+    if [[ ${status} =~ "Final-State : SUCCEEDED" ]]
     then
         return 0
     else
@@ -246,7 +268,6 @@ get_application_status() {
     fi
 }
 
-...
 
 ```
 
@@ -261,12 +282,12 @@ Use the extracted applicationId to collect logs to designated directory after th
 
 # collect aggregated logs to designated directory
 sleep 5
-collect_log "$APPLICATION_ID" "$LOG_PATH/$logFileName.txt" 10 3
+collect_log "${APPLICATION_ID}" "$LOG_DIR/${logFileName}.txt" 10 3
 collectLogExit=$?
 
 # exiting
-finalExit=$(($trapExit+$sparkSubmitExit+$collectLogExit))
-exit_with_code $finalExit
+finalExit=$((${trapExit}+${sparkSubmitExit}+${collectLogExit}))
+exit_with_code ${finalExit}
 ```
 
 where `shell_functions.sh` include:
@@ -275,26 +296,24 @@ where `shell_functions.sh` include:
 
 #!/bin/bash
 
-...
-
 collect_log_helper() {
     applicationId=$1
     logPath=$2
 
     echo "Collecting log..."
-    output=$(yarn logs -applicationId $applicationId -log_files stdout stderr -am 1 2>&1)
-    status=$(yarn application -status $applicationId 2>&1)
+    output=$(yarn logs -applicationId ${applicationId} -log_files stdout stderr -am 1 2>&1)
+    status=$(yarn application -status ${applicationId} 2>&1)
     if [[ "$output" =~ "Can not find" ]] || [[ "$output" =~ "Unable to get" ]] || [[ "$output" =~ "File "+[a-z0-9\/\_]*+"${applicationId} does not exist." ]] # log aggregation not ready yet
     then
-        echo "$output"
-        if [[ ! "$status" =~ "Log Aggregation Status : SUCCEEDED" ]]
+        echo "${output}"
+        if [[ ! ${status} =~ "Log Aggregation Status : SUCCEEDED" ]]
         then
-            echo "$status"
-            if [[ "$status" =~ "State : KILLED" && ( "$status" =~ "Log Aggregation Status : NOT_START" || "$status" =~ "Log Aggregation Status : N/A" ) ]]
+            echo "${status}"
+            if [[ ${status} =~ "State : KILLED" && ( "${status}" =~ "Log Aggregation Status : NOT_START" || "${status}" =~ "Log Aggregation Status : N/A" ) ]]
             then
                 echo "Log aggregation not started. Skipping log collection..." # usually because log is not generated, e.g., application was killed before it started runnning
                 return 0
-            elif [[ "$status" =~ "Log Aggregation Status : DISABLED" ]]
+            elif [[ ${status} =~ "Log Aggregation Status : DISABLED" ]]
             then
                 echo "Log aggregation disabled. Skipping log collection..."
                 return 0
@@ -306,10 +325,11 @@ collect_log_helper() {
             return 1
         fi
     else
-        # echo "yarn logs -applicationId $applicationId -log_files stdout stderr -am 1 | hadoop fs -appendToFile - $logPath"
-        # yarn logs -applicationId $applicationId -log_files stdout stderr -am 1 | hadoop fs -appendToFile - $logPath
-        echo "yarn logs -applicationId $applicationId -log_files stdout stderr -am 1 |& tee -a $logPath"
-        (yarn logs -applicationId $applicationId -log_files stdout stderr -am 1 |& tee -a $logPath) >/dev/null
+        # echo "yarn logs -applicationId ${applicationId} -log_files stdout stderr -am 1 | hadoop fs -appendToFile - ${logPath}"
+        # yarn logs -applicationId ${applicationId} -log_files stdout stderr -am 1 | hadoop fs -appendToFile - ${logPath}
+        echo "yarn logs -applicationId ${applicationId} -log_files stdout stderr -am 1 |& tee -a ${logPath}"
+        # (yarn logs -applicationId ${applicationId} -log_files stdout stderr -am 1 |& tee -a $logPath) >/dev/null # do not print log
+        yarn logs -applicationId ${applicationId} -log_files stdout stderr -am 1 |& tee -a ${logPath} # print log
         statuses=( "${PIPESTATUS[@]}" ) # copy PIPESTATUS to array statuses
         yarnCmdStatus=${statuses[$(( ${#statuses[@]} - 2 ))]}
         hadoopCmdStatus=${statuses[$(( ${#statuses[@]} - 1 ))]}
@@ -324,17 +344,17 @@ collect_log_helper() {
 
 collect_log() {
     applicationId=$1
-    if [ $applicationId != "" ]
+    if [[ ${applicationId} != "" ]]
     then
         logPath=$2
         retryInterval=$3
         maxRetryNo=$4
-        collect_log_helper $applicationId $logPath
+        collect_log_helper ${applicationId} ${logPath}
         RET=$?
         while [[ ${RET} -ne 0 && ${maxRetryNo} -gt 0 ]]; do
-            echo "Log collection failed, retrying in $retryInterval seconds..."
-            sleep $retryInterval
-            collect_log_helper $applicationId $logPath
+            echo "Log collection failed, retrying in ${retryInterval} seconds..."
+            sleep ${retryInterval}
+            collect_log_helper ${applicationId} ${logPath}
             RET=$?
             maxRetryNo=$((maxRetryNo-1))
         done
@@ -343,7 +363,7 @@ collect_log() {
             echo "Maximum number of retries reached. Aborting log collection..."
             return 1
         else
-            return $RET
+            return ${RET}
         fi
     else
         echo "No applicationId. Skipping log collection..." # technically this won't happen
@@ -351,12 +371,7 @@ collect_log() {
     fi
 }
 
-
-exit_with_code() {
-    exitCode=$1
-    echo "Exiting with code $exitCode."
-    exit ${exitCode}
-}
+...
 ```
 
 #### Workflow
