@@ -127,7 +127,7 @@ log4j.rootLogger=INFO, stdout, stderr
 log4j.logger.Client = INFO, stdout, stderr
 ```
 2. Pass the above log4j.properties file to the `SPARK_SUBMIT_OPTS` of the driver server that runs the client process. This gets the client process' log to be printed to the driver server's console.
-```
+```sh
 SPARK_SUBMIT_OPTS="-Dlog4j.debug=true -Dlog4j.configuration=file://${ROOT}/xxx/config/log4j.properties" \
 spark-submit \
 --queue ${QUEUE} \
@@ -149,7 +149,7 @@ ${ROOT}/xxx/xxx/${FOLDER_NAME}/${SCRIPT_NAME}.py ${param}
     </div>
 3. Read the client process' log line by line to extract the applicationId.
 
-```
+```sh
 #!/bin/bash
 
 # constants
@@ -231,7 +231,7 @@ sparkSubmitExit=$?
 
 where `shell_functions.sh` include:
 
-```
+```sh
 
 #!/bin/bash
 
@@ -275,7 +275,7 @@ get_application_status() {
 
 Use the extracted applicationId to collect logs to designated directory after the application is finished.
 
-```
+```sh
 #!/bin/bash
 
 ...
@@ -292,7 +292,7 @@ exit_with_code ${finalExit}
 
 where `shell_functions.sh` include:
 
-```
+```sh
 
 #!/bin/bash
 
