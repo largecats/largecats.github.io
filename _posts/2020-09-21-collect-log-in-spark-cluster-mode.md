@@ -167,10 +167,6 @@ fi
 FOLDER_NAME="xxx"
 SCRIPT_NAME="xxx"
 
-# directory to store logs
-LOG_DIR="${ROOT}/logs/${FOLDER_NAME}"
-mkdir -p ${LOG_DIR}
-
 param=${@}
 sparkAppName="XXX - XXX ${param}"
 sparkConfig=$(cat <<-END
@@ -194,18 +190,6 @@ run() {
 
 # helper functions
 source "${ROOT}/xxx/common/shell_functions.sh"
-
-# construct name of log file from parameters
-logFileName=${SCRIPT_NAME}
-for arg in ${param[@]}
-    do
-        if [[ ! $arg =~ "${ROOT_HDFS}" ]]
-        then
-            logFileName+="_${arg}"
-        else
-            logFileName+="_${arg//\//-}" # change / to - in path so that the path can appear in the name of the log file
-        fi
-    done
 
 APPLICATION_ID=""
 
@@ -279,7 +263,20 @@ Use the extracted applicationId to collect logs to designated directory after th
 #!/bin/bash
 
 ...
-
+# directory to store logs
+LOG_DIR="${ROOT}/logs/${FOLDER_NAME}"
+mkdir -p ${LOG_DIR}
+# construct name of log file from parameters
+logFileName=${SCRIPT_NAME}
+for arg in ${param[@]}
+    do
+        if [[ ! $arg =~ "${ROOT_HDFS}" ]]
+        then
+            logFileName+="_${arg}"
+        else
+            logFileName+="_${arg//\//-}" # change / to - in path so that the path can appear in the name of the log file
+        fi
+    done
 # collect aggregated logs to designated directory
 sleep 5
 collect_log "${APPLICATION_ID}" "$LOG_DIR/${logFileName}.txt" 10 3
