@@ -164,8 +164,8 @@ else
     QUEUE="regular"
 fi
 
-FOLDER_NAME="xxx"
-SCRIPT_NAME="xxx"
+FOLDER_NAME=$(basename $(dirname $(realpath $BASH_SOURCE)))
+SCRIPT_NAME=$(basename $BASH_SOURCE .sh)
 
 param=${@}
 sparkAppName="XXX - XXX ${param}"
