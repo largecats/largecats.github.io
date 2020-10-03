@@ -153,21 +153,21 @@ ${ROOT}/xxx/xxx/${FOLDER_NAME}/${SCRIPT_NAME}.py ${param}
 #!/bin/bash
 
 # constants
+ROOT_HDFS="/user/${USER}"
 if [[ ${USER} =~ "xxx" ]]
 then
-    ROOT_HDFS="/user/xxx"
     ROOT="/home/xxx"
     QUEUE="xxx"
 else
-    ROOT_HDFS="/user/${USER}"
     ROOT="/ldap_home/${USER}"
     QUEUE="regular"
 fi
 
-FOLDER_NAME="xxx"
-SCRIPT_NAME="xxx"
+FOLDER_NAME=$(basename $(dirname $BASH_SOURCE))
+SCRIPT_NAME=$(basename $BASH_SOURCE .sh)
 
 param=${@}
+
 sparkAppName="XXX - XXX ${param}"
 sparkConfig=$(cat <<-END
     --num-executors 100 \
