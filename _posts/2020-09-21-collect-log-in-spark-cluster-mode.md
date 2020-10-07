@@ -306,7 +306,7 @@ collect_log_helper() {
         if [[ ! ${status} =~ "Log Aggregation Status : SUCCEEDED" ]]
         then
             echo "${status}"
-            if [[ ${status} =~ "State : KILLED" && ( "${status}" =~ "Log Aggregation Status : NOT_START" || "${status}" =~ "Log Aggregation Status : N/A" ) ]]
+            if [[ (${status} =~ "State : KILLED") && ( "${status}" =~ "Log Aggregation Status : NOT_START" || "${status}" =~ "Log Aggregation Status : N/A" ) ]]
             then
                 echo "Log aggregation not started. Skipping log collection..." # usually because log is not generated, e.g., application was killed before it started runnning
                 return 0
@@ -355,7 +355,7 @@ collect_log() {
             RET=$?
             maxRetryNo=$((maxRetryNo-1))
         done
-        if [[ (${RET} -neq 0) && (${maxRetryNo} -eq 0) ]]
+        if [[ ${RET} -ne 0 && ${maxRetryNo} -eq 0 ]]
         then
             echo "Maximum number of retries reached. Aborting log collection..."
             return 1
