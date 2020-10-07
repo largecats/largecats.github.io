@@ -344,8 +344,8 @@ collect_log() {
     if [[ ${applicationId} != "" ]]
     then
         logPath=$2
-        retryInterval=$3
-        maxRetryNo=$4
+        retryInterval=30
+        maxRetryNo=5
         collect_log_helper ${applicationId} ${logPath}
         RET=$?
         while [[ ${RET} -ne 0 && ${maxRetryNo} -gt 0 ]]; do
@@ -355,7 +355,7 @@ collect_log() {
             RET=$?
             maxRetryNo=$((maxRetryNo-1))
         done
-        if [ ${maxRetryNo} -eq 0 ]
+        if [[ (${RET} -neq 0) && (${maxRetryNo} -eq 0) ]]
         then
             echo "Maximum number of retries reached. Aborting log collection..."
             return 1
