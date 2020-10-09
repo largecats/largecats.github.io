@@ -21,7 +21,7 @@ tags: spark
 
 # Motivation   
 
-We have been experiencing timeout errors that may happen while the Spark application is running or after the Spark application has finished. This caused much inconvenience as we need to retrigger the failed jobs or manually mark them as success in Airflow, thus delaying downstream jobs. Previously, these timeout errors were masked as we relied on Airflow's auto-retry mechanism to retrigger failed jobs. But since some of these timeout errors may occur after the job finishes, to save resource (i.e., avoid running the same job twice), we decided to set the retry to 0 times. As a result, the full magnitude of the timeout errors is exposed and need to be dealt with. We collected the most frequent types of timeout errors and their solutions below.
+Timeout errors may occur while the Spark application is running or even after the Spark application has finished. Below are some common timeout errors and their solutions.
 
 
 
