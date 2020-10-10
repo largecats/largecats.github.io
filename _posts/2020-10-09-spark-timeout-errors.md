@@ -49,4 +49,4 @@ As suggested [here](http://mail-archives.apache.org/mod_mbox/spark-issues/201807
 <div align="center">
 </div>
 
-As suggested [here](https://stackoverflow.com/questions/41123846/why-does-join-fail-with-java-util-concurrent-timeoutexception-futures-timed-ou), join operations on large datasets may fail with `spark.sql.broadcastTimeout`. Assuming that the joins have been optimized to a reasonable extent, a simple solution is to set a higher value than the default 300s (we set it to 10000000).
+As suggested [here](https://stackoverflow.com/questions/41123846/why-does-join-fail-with-java-util-concurrent-timeoutexception-futures-timed-ou), join operations on large datasets may fail with `spark.sql.broadcastTimeout`. Assuming that the joins have been optimized to a reasonable extent, a simple solution is to set a higher value than the default 300s (we set it to 36000).
