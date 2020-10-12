@@ -306,19 +306,26 @@ collect_log_helper() {
         if [[ ! ${status} =~ "Log Aggregation Status : SUCCEEDED" ]]
         then
             echo "${status}"
-            if [[ (${status} =~ "State : KILLED") && ( "${status}" =~ "Log Aggregation Status : NOT_START" || "${status}" =~ "Log Aggregation Status : N/A" ) ]]
+            if [[ ! ${status} =~ "State : KILLED" ]]
             then
-                echo "Log aggregation not started. Skipping log collection..." # usually because log is not generated, e.g., application was killed before it started runnning
-                return 0
-            elif [[ ${status} =~ "Log Aggregation Status : DISABLED" ]]
-            then
-                echo "Log aggregation disabled. Skipping log collection..."
-                return 0
-            else
                 echo "Log aggregation incomplete. Waiting for retry..."
-                return 1
+                return 2 # unlimited retry if spark job succeeded or failed (i.e., terminated naturally)
+            else
+                if [[ "${status}" =~ "Log Aggregation Status : NOT_START" || "${status}" =~ "Log Aggregation Status : N/A" ]]
+                then
+                    echo "Log aggregation not started. Skipping log collection..." # usually because log is not generated, e.g., application was killed before it started runnning
+                    return 0
+                elif [[ ${status} =~ "Log Aggregation Status : DISABLED" ]]
+                then
+                    echo "Log aggregation disabled. Skipping log collection..."
+                    return 0
+                else
+                    echo "Log aggregation incomplete. Waiting for retry..."
+                    return 1 # limited retry
+                fi
             fi
         else
+            echo "Log collection failed. Waiting for retry..."
             return 1
         fi
     else
@@ -330,7 +337,7 @@ collect_log_helper() {
         statuses=( "${PIPESTATUS[@]}" ) # copy PIPESTATUS to array statuses
         yarnCmdStatus=${statuses[$(( ${#statuses[@]} - 2 ))]}
         hadoopCmdStatus=${statuses[$(( ${#statuses[@]} - 1 ))]}
-        if [ ${yarnCmdStatus} -eq 0 ] && [ ${hadoopCmdStatus} -eq 0 ]
+        if [[ ${yarnCmdStatus} -eq 0 && ${hadoopCmdStatus} -eq 0 ]]
         then
             return 0
         else
