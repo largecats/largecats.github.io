@@ -177,12 +177,14 @@ In other words, if the query is simple but the dataframe is huge, it may be fast
 
 In the above example, the query is simple but the underlying dataframe is quite huge. As a result, caching `t0` takes more time (~14min) than not caching (~9min).
 
-<div style="text-align: center"><img src="/images/t0_without_cache_start-end_time.jpg" width="800px" /></div>
-<div align="center">
-</div>
-
 <div style="text-align: center"><img src="/images/t0_cache_start-end_time.jpg" width="800px" /></div>
 <div align="center">
+<sup>Start time, end time of t0 with cache.</sup>
+</div>
+
+<div style="text-align: center"><img src="/images/t0_without_cache_start-end_time.jpg" width="800px" /></div>
+<div align="center">
+<sup>Start time, end time of t0 without cache.</sup>
 </div>
 
 ## Caching eagerly can improve readability when tracking progress in YARN UI
