@@ -3,7 +3,7 @@ layout: post
 title:  "Caching in Spark"
 date:   2020-10-17
 categories: work
-tags: spark
+tags: spark YARN
 ---
 <head>
     <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script>
