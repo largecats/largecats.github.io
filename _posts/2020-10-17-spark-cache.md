@@ -110,7 +110,7 @@ df.show() # triggers evaluation
 ```
 Execution plan of this query shows that `t0` is effectively evaluated twice.
 
-<div style="text-align: center"><img src="/images/t0_without_cache_DAG_visualization.jpg" width="800px" /></div>
+<div style="text-align: center"><img src="/images/t0_without_cache_DAG_visualization.jpg" width="600px" /></div>
 <div align="center">
 <sup>In particular, the region = 'TH' filter in t0 is evaluated twice, once to compute t1, the other time to compute t2.</sup>
 </div>
@@ -164,7 +164,7 @@ df = spark.sql(query)
 df.show()
 ```
 Execution plan of the second query shows that `t0` is stored in cache memory and reused by `t1` and `t2`.
-<div style="text-align: center"><img src="/images/t0_cache_DAG_visualization.jpg" width="800px" /></div>
+<div style="text-align: center"><img src="/images/t0_cache_DAG_visualization.jpg" width="600px" /></div>
 <div align="center">
 <sup>Because t0 is cached, it is read from InMemoryTableScan, and the filter on region in t0 is not re-evaluated when computing t1 and t2.</sup>
 </div>
