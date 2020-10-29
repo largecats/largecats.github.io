@@ -300,17 +300,17 @@ collect_log_helper() {
     echo "Collecting log..."
     output=$(yarn logs -applicationId ${applicationId} -log_files stdout stderr -am 1 2>&1)
     status=$(yarn application -status ${applicationId} 2>&1)
+    echo "${status}"
     if [[ "$output" =~ "Can not find" ]] || [[ "$output" =~ "Unable to get" ]] || [[ "$output" =~ "File "+[a-z0-9\/\_]*+"${applicationId} does not exist." ]] # log aggregation not ready yet
     then
         echo "${output}"
-        if [[ ! ${status} =~ "Log Aggregation Status : SUCCEEDED" ]]
+        if [[ ${status} =~ "State : FINISHED" ]]
         then
-            echo "${status}"
-            if [[ ! ${status} =~ "State : KILLED" ]]
+            echo "Log collection failed. Waiting for retry..."
+            return 2 # unlimited retry if spark job finished, because in this case it must have stdout/stderr log in the driver container
+        else
+            if [[ ! ${status} =~ "Log Aggregation Status : SUCCEEDED" ]] # log aggregation did not succeed
             then
-                echo "Log aggregation incomplete. Waiting for retry..."
-                return 2 # unlimited retry if spark job succeeded or failed (i.e., terminated naturally)
-            else
                 if [[ "${status}" =~ "Log Aggregation Status : NOT_START" || "${status}" =~ "Log Aggregation Status : N/A" ]]
                 then
                     echo "Log aggregation not started. Skipping log collection..." # usually because log is not generated, e.g., application was killed before it started runnning
@@ -321,12 +321,12 @@ collect_log_helper() {
                     return 0
                 else
                     echo "Log aggregation incomplete. Waiting for retry..."
-                    return 1 # limited retry
+                    return 1 # application not in FINISHED status (possibly killed and may not have logs), limited retry
                 fi
+            else # log aggregation SUCCEEDED but log collection still failed
+                echo "Log collection failed. Waiting for retry..."
+                return 1 # if job status went from ACCEPTED -> FAILED without RUNNING, log aggregation may still succeed (without a stdout/stderr log in the driver container), so make this limited retry
             fi
-        else
-            echo "Log collection failed. Waiting for retry..."
-            return 1
         fi
     else
         # echo "yarn logs -applicationId ${applicationId} -log_files stdout stderr -am 1 | hadoop fs -appendToFile - ${logPath}"
