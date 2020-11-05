@@ -27,7 +27,9 @@ Chapter 2 of [Computer Organization and Design](http://ac.aua.am/arm/public/2017
 **Definition.** The two's complement of an $n$-bit binary number $x$ is given by $\bar{x}+1$, where $\bar{x}$ is constructed from $x$ by inverting the $0$s and $1$s.
 
 **Definition.** The two's complement representation of a signed $n$-bit number $a_{n-1}\cdots a_1a_0$ (or simply "two's complement number") is given by
-$$-2^{n-1} a_{n-1} + 2^{n-2}a_{n-2}+ \cdots 2^1 a_1 + 2^0a_0,$$
+
+$$-2^{n-1} a_{n-1} + 2^{n-2}a_{n-2}+ \cdots 2^1 a_1 + 2^0a_0$$
+
 where the first bit is the sign bit.
 
 **Theorem.** Let $x_c$ denote the two's complement of an $n$-bit binary number $x$. Then $x + x_c = 2^n$ in decimal.
