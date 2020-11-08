@@ -5,7 +5,6 @@ layout: default
 <div class="page clearfix" index>
     <div class="left">
         <h1>Welcome to largecats' blog</h1>
-        <!-- <small>这里记录着我的前端学习之路</small> -->
         <hr>
         <ul>
             {% for post in paginator.posts %}
@@ -44,9 +43,6 @@ layout: default
             {% endfor %}
         </ul>
 
-
-
-        <!-- Pagination links -->
         <div class="pagination">
           {% if paginator.previous_page %}
             <a href="/index.html" class="previous"><i class="fa fa-angle-double-left"></i></a>
@@ -65,9 +61,31 @@ layout: default
           {% endif %}
         </div>
     </div>
-    <!-- <button class="anchor"><i class="fa fa-anchor"></i></button> -->
+
     <div class="right">
         <div class="wrap">
+            <div class="side">
+              <div>
+                  <i class="fa fa-search" aria-hidden="true"></i>
+                  Recent Posts
+              </div>
+                <p></p>
+                <div id="search-container">
+                  <input type="text" id="search-input" placeholder="search...">
+                  <ul id="results-container"></ul>
+                </div>
+                 
+                <!-- script pointing to jekyll-search.js -->
+                <script src="{{ "/js/searchBox.js " | prepend: site.baseurl }}" charset="utf-8"></script>
+                <script>
+                    SimpleJekyllSearch({
+                      searchInput: document.getElementById('search-input'),
+                      resultsContainer: document.getElementById('results-container'),
+                      json: "{{ "/search.json" | prepend: site.baseurl }}"
+                    })
+                </script>
+            </div>
+
             <div class="side">
                 <div>
                     <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
@@ -143,18 +161,6 @@ layout: default
                     {% endfor %}
                 </div>
             </div>
-
-            <!-- <div class="side">
-                <div>
-                    <i class="fa fa-external-link"></i>
-                    Links
-                </div>
-                <ul  class="content-ul">
-
-                </ul>
-            </div> -->
         </div>
     </div>
 </div>
-<!-- <script src="{{ "/js/scroll.min.js " | prepend: site.baseurl }}" charset="utf-8"></script> -->
-<!-- <script src="{{ "/js/pageContent.js " | prepend: site.baseurl }}" charset="utf-8"></script> -->
