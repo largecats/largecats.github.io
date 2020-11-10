@@ -247,14 +247,14 @@ Among the series of transformations, there is a range where adding `df.cache()` 
 df = df.withColumn('c1', complex_udf1(df['c0']))
 df = df.withColumn('c2', complex_udf2(df['c1']))
 # df.cache() effective range lower limit
-df = df.withColumn('c3', complex_udf2(df['c2']))
-df = df.withColumn('c4', complex_udf2(df['c3']))
-df = df.withColumn('c5', complex_udf2(df['c4']))
+df = df.withColumn('c3', complex_udf3(df['c2']))
+df = df.withColumn('c4', complex_udf4(df['c3']))
+df = df.withColumn('c5', complex_udf5(df['c4']))
 df.cache() # effective
-df = df.withColumn('c6', complex_udf2(df['c5']))
-df = df.withColumn('c7', complex_udf2(df['c6']))
-df = df.withColumn('c8', complex_udf2(df['c7']))
-df = df.withColumn('c9', complex_udf2(df['c8']))
+df = df.withColumn('c6', complex_udf6(df['c5']))
+df = df.withColumn('c7', complex_udf7(df['c6']))
+df = df.withColumn('c8', complex_udf8(df['c7']))
+df = df.withColumn('c9', complex_udf9(df['c8']))
 # df.cache() effective range upper limit
-df = df.withColumn('c10', complex_udf2(df['c9']))
+df = df.withColumn('c10', complex_udf10(df['c9']))
 ```
