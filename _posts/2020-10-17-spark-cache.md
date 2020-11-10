@@ -196,3 +196,65 @@ For Spark jobs that use complex SQL queries, the `SQL` page in YARN UI is a good
 </div>
 
 So if a dataframe needs to be cached at all, can consider caching eagerly using `spark.sql('cache table xxx')`, so that the query execution can be broken down into more trackable pieces. Moreover, when optimizing queries, it is recommended to cache each intermediate table eagerly, so as to make identifying bottlenecks easier.
+
+## Caching helps preventing stackoverflow in nested query plans
+
+If the query plan structure is nested too deeply, Spark may throw `StackOverflowError` (see [here] (https://stackoverflow.com/questions/25147565/serializing-java-object-without-stackoverflowerror) and [here](https://stackoverflow.com/questions/37909444/spark-java-lang-stackoverflowerror)). This occurs when there are too many nested layers of column computation in intermediate tables, .e.g., 
+
+```sql
+WTIH t1 AS (
+    SELECT
+        *,
+        complex_function1(c0) AS c1
+    FROM t0
+),
+
+t2 AS (
+    SELECT
+        *,
+        complex_function2(c1) AS c2
+    FROM t1
+),
+
+t3 AS (
+    SELECT
+        *,
+        complex_function2(c1) AS c3
+    FROM t2
+)
+
+...
+```
+
+Alternatively, in pyspark:
+
+```python
+df = df.withColumn('c1', complex_udf1(df['c0']))
+df = df.withColumn('c2', complex_udf2(df['c1']))
+df = df.withColumn('c3', complex_udf2(df['c2']))
+...
+```
+
+<div style="text-align: center"><img src="/images/stackoverflow_error.jpg" width="800px" /></div>
+<div align="center">
+</div>
+
+One possible solution is to add `df.cache()` somewhere in the middle of the series of transformations. It seems that doing so would store the query plan so far somewhere off-stack, thereby reducing the stack and preventing stackoverflow.
+
+Among the series of transformations, there is a range where adding `df.cache()` is effective. E.g., in the example below, adding `df.cache()` too early may cause the transformations behind to overflow, and adding `df.cache()` too late may cause the transformations in front to overflow.
+
+```python
+df = df.withColumn('c1', complex_udf1(df['c0']))
+df = df.withColumn('c2', complex_udf2(df['c1']))
+# df.cache() effective range lower limit
+df = df.withColumn('c3', complex_udf2(df['c2']))
+df = df.withColumn('c4', complex_udf2(df['c3']))
+df = df.withColumn('c5', complex_udf2(df['c4']))
+df.cache() # effective
+df = df.withColumn('c6', complex_udf2(df['c5']))
+df = df.withColumn('c7', complex_udf2(df['c6']))
+df = df.withColumn('c8', complex_udf2(df['c7']))
+df = df.withColumn('c9', complex_udf2(df['c8']))
+# df.cache() effective range upper limit
+df = df.withColumn('c10', complex_udf2(df['c9']))
+```
