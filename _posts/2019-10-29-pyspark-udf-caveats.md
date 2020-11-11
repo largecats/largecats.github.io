@@ -80,7 +80,7 @@ only showing top 10 rows
 I encountered the following pitfalls when using udfs. 
 
 
-# Use udfs only when necessary
+## Use udfs only when necessary
 
 Spark optimizes native operations. One such optimization is [predicate pushdown](https://jaceklaskowski.gitbooks.io/mastering-spark-sql/spark-sql-Optimizer-PushDownPredicate.html).
 
@@ -159,7 +159,7 @@ Now, instead of `df.number > 0`, use a `filter_udf` as the predicate. Observe th
 <sup>Frequency distribution of execution times of df1.count() and df2.count(), with sample size 30.</sup>
 </div>
 
-# Debug udfs by raising exceptions
+## Debug udfs by raising exceptions
 
 Programs are usually debugged by raising exceptions, inserting breakpoints (e.g., using debugger), or quick printing/logging.
 
@@ -212,7 +212,7 @@ Another way to validate this is to observe that if we submit the spark job in st
 
 There are a few workarounds.
 
-## Yarn commands
+### Yarn commands
 1. Enable yarn log aggregation by setting
    
 ```
@@ -237,7 +237,7 @@ Note: To see that the above is the log of an executor and not the driver, can vi
 
 This method is straightforward, but requires access to yarn configurations. This could be not as straightforward if the production environment is not managed by the user.
 
-## Raise exceptions
+### Raise exceptions
 
 Another way to show information from udf is to raise exceptions, e.g.,
 ```python
@@ -254,11 +254,11 @@ def get_item_price(number, price):
 
 This method is independent from production environment configurations. But the program does not continue after raising exception.
 
-## Return message with output
+### Return message with output
 
 Yet another workaround is to wrap the message with the output, as suggested [here](https://stackoverflow.com/questions/54252682/pyspark-udf-print-row-being-analyzed), and then extract the real output afterwards.
 
-# Do not use DataFrame objects inside udfs
+## Do not use DataFrame objects inside udfs
 
 Serialization is the process of turning an object into a format that can be stored/transmitted (e.g., byte stream) and reconstructed later.
 
@@ -308,11 +308,11 @@ Some workarounds include:
 2. If the query is too complex to use join and the dataframe is small enough to fit in memory, consider converting the Spark dataframe to Pandas dataframe via `.toPandas()` and perform query on the pandas dataframe object.
 3. If the object concerned is not a Spark context, consider implementing Java's Serializable interface (e.g., in Scala, this would be `extend Serializable`).
 
-# Do not import / define udfs before creating SparkContext
+## Do not import / define udfs before creating SparkContext
 
 Spark udfs require `SparkContext` to work. So udfs must be defined or imported after having initialized a `SparkContext`. Otherwise, the Spark job will freeze, see [here](https://stackoverflow.com/questions/35923775/functions-from-custom-module-not-working-in-pyspark-but-they-work-when-inputted).
 
-# Defining udfs in a class
+## Defining udfs in a class
 If udfs are defined at top-level, they can be imported without errors.
 
 If udfs need to be put in a class, they should be defined as attributes built from static methods of the class, e.g.,

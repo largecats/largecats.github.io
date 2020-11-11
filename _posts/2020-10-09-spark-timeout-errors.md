@@ -23,9 +23,9 @@ Timeout errors may occur while the Spark application is running or even after th
 
 
 
-# Errors and solutions
+## Errors and solutions
 
-## spark.rpc.RpcTimeoutException
+### spark.rpc.RpcTimeoutException
 
 <div style="text-align: center"><img src="/images/spark_rpc_askTimeout.png" width="800px" /></div>
 <div align="center">
@@ -33,7 +33,7 @@ Timeout errors may occur while the Spark application is running or even after th
 
 As suggested [here](https://stackoverflow.com/questions/39354909/how-to-tune-spark-rpc-asktimeout) and [here](https://stackoverflow.com/questions/37260230/spark-cluster-full-of-heartbeat-timeouts-executors-exiting-on-their-own), it is recommended to set `spark.network.timeout` to a higher value than the default 120s (we set it to 10000000). Alternatively, one may consider switching to [later versions of Spark](https://github.com/apache/spark/blob/9fcf0ea71820f7331504073045c38820e50141c7/python/pyspark/rdd.py), where certain relevant timeout values are set to `None`.
 
-## java.util.concurrent.TimeoutException
+### java.util.concurrent.TimeoutException
 
 We observed that this error usually occurs while the query is running or just before the Spark application finishes.
 

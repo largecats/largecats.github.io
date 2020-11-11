@@ -23,15 +23,15 @@ Spark's caching mechanism can be leveraged to optimize performance. Here are som
 
 
 
-# Basics
-## Ways to cache
+## Basics
+### Ways to cache
 Dataframes or tables may be cached in the following ways.
 
 * `df.cache()` - lazy, `df` is only evaluated after an action is called.
 * `spark.catalog.cacheTable('t0')` - also lazy.
 * `spark.sql('cache table t0')` - eager, `t0` is evaluated immediately.
 
-## Ways to "uncache"
+### Ways to "uncache"
 * `df.unpersist()` - convenient when there is a variable readily referencing the dataframe.
 * `spark.catalog.clearCache()` - will clear all dataframes/tables cached via any of the above 3 ways.
 
@@ -60,9 +60,9 @@ DataFrame[]
 >>>
 ```
 
-# Caveats
+## Caveats
 
-## Temporary tables in Spark SQL are not automatically cached
+### Temporary tables in Spark SQL are not automatically cached
 
 Information online (e.g., [here](https://www.essentialsql.com/get-ready-to-learn-sql-server-20-using-subqueries-in-the-select-statement/) and [here](https://stackoverflow.com/questions/54737872/how-to-cache-subquery-result-in-with-clause-in-spark-sql)) says that temporary tables created in SQL are computed only once and can be reused. But the physical plans of SparkSQL shows that the temp tables are evaluated each time they are used. Consider the following query:
 
@@ -167,7 +167,7 @@ Execution plan of the second query shows that `t0` is stored in cache memory and
 <sup>Because t0 is cached, it is read from InMemoryTableScan, and the filter on region in t0 is not re-evaluated when computing t1 and t2.</sup>
 </div>
 
-## Caching may take more time than not caching
+### Caching may take more time than not caching
 
 If the time it takes to compute a table * the times it is used > the time it takes to cache the table, then caching may save time. Otherwise, not caching would be faster.
 
@@ -185,7 +185,7 @@ In the above example, the query is simple but the underlying dataframe is quite 
 <sup>Start time, end time of t0 without cache.</sup>
 </div>
 
-## Caching eagerly can improve readability when tracking progress in YARN UI
+### Caching eagerly can improve readability when tracking progress in YARN UI
 
 For Spark jobs that use complex SQL queries, the `SQL` page in YARN UI is a good way to track the progress of each query. However due to Spark's lazy evaluation, if the intermeidate tables are not cached eagerly or don't have any actions called upon them (e.g., `df.show()`), all the queries will be lumped together into one huge execution plan to be evaluated at the last step, e.g.:
 
@@ -195,7 +195,7 @@ For Spark jobs that use complex SQL queries, the `SQL` page in YARN UI is a good
 
 So if a dataframe needs to be cached at all, can consider caching eagerly using `spark.sql('cache table xxx')`, so that the query execution can be broken down into more trackable pieces. Moreover, when optimizing queries, it is recommended to cache each intermediate table eagerly, so as to make identifying bottlenecks easier.
 
-## Caching helps preventing stackoverflow in nested query plans
+### Caching helps preventing stackoverflow in nested query plans
 
 If the query plan structure is nested too deeply, Spark may throw `StackOverflowError` (see [here] (https://stackoverflow.com/questions/25147565/serializing-java-object-without-stackoverflowerror) and [here](https://stackoverflow.com/questions/37909444/spark-java-lang-stackoverflowerror)). This occurs when there are too many nested layers of column computation in intermediate tables, .e.g., 
 
