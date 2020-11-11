@@ -1,9 +1,8 @@
 .page[index] {
     a {
         color: #4d6dad;
-        transition: 0.5s ease;
         &:hover {
-            color: #223253;
+            text-decoration: underline;
         }
     }
     .left {
@@ -51,9 +50,8 @@
                     font-size: 14px;
                     a {
                         color: #778ab0;
-                        transition: 0.2s ease;
                         &:hover {
-                            color: #5872a7;
+                            text-decoration: underline;
                         }
                         i {
                             padding-right: 3px;
@@ -98,10 +96,11 @@
                             padding: 2px 0;
                             border-bottom: 1px solid #eee;
                             &:hover {
+                                text-decoration: underline;
                                 background-color: #dbdfee;
                                 .badge {
                                     background-color: #dbdfee;
-                                    transform: scale(1.2) rotate(360deg);
+                                    // transform: scale(1.2) rotate(360deg);
                                 }
                             }
                             .name {
@@ -141,7 +140,7 @@
                         padding: 0 3px;
                         border-radius: 5px;
                         &:hover {
-                            background-color: #f0e7ce;
+                            text-decoration: underline;
                         }
                     }
                 }
