@@ -9,15 +9,13 @@ tags: spark pyspark
 * content
 {:toc}
 
-## Motivation
-
 I want to use PySpark form Jupyter Notebook for covenient view of program output.
+
+
 
 ## Preparation
 
 This post assumes configurations in [this earlier post](https://largecats.github.io/2019/07/31/set-up-spark-on-windows/). I read [this article](https://blog.sicara.com/get-started-pyspark-jupyter-guide-tutorial-ae2fe84f594f).
-
-
 
 ## Method
 

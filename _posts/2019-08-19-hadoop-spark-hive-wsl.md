@@ -9,8 +9,6 @@ tags: hadoop spark hive wsl
 * content
 {:toc}
 
-## Motivation
-
 I want to set up Hadoop, Spark, and Hive on my personal laptop.
 
 

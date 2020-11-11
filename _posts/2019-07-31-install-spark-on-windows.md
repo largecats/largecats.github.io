@@ -9,15 +9,13 @@ tags: spark pyspark scala
 * content
 {:toc}
 
-## Motivation
-
 I want to install Spark on my PC.
+
+
 
 ## Preparation
 
 I read chapter 2 of O'Reilly's [Learning Spark](https://www.oreilly.com/library/view/learning-spark/9781449359034/).
-
-
 
 ## Method
 

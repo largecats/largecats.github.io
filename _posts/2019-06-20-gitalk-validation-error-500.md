@@ -9,10 +9,6 @@ tags: gitalk
 * content
 {:toc}
 
-This post refers to [how this particular blog site is configured](https://largecats.github.io/2019/06/17/Build-blog/).
-
-## Problem
-
 I got a `Error: Validation Failed with status code 500` Gitalk error after publishing a new blog post.
 
 

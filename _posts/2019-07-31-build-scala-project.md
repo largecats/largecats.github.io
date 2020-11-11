@@ -9,15 +9,13 @@ tags: scala
 * content
 {:toc}
 
-## Motivation
-
 I want to build `.scala` file.
+
+
 
 ## Preparation
 
 This post assumes configurations in [this earlier post](https://largecats.github.io/2019/07/31/install-scala-on-windows/).
-
-
 
 ## Method
 

@@ -9,8 +9,6 @@ tags: python
 * content
 {:toc}
 
-## Problem
-
 I recently installed Anaconda 3 with Python 3.6.8. Calling `matplotlib.pylot` raises the error
 ```
 This application failed to start because it could not find or load the Qt platform plugin "windows" in "" 

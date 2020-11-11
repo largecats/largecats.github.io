@@ -17,11 +17,9 @@ tags: spark YARN
     </script>
 </head>
 * content
-{:toc}
+{:toc} 
 
-# Motivation   
-
-Spark's caching mechanism can be leveraged to optimize performance. Here are some basic facts and caveats about caching.
+Spark's caching mechanism can be leveraged to optimize performance. Here are some facts and caveats about caching.
 
 
 

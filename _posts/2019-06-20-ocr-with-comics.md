@@ -9,8 +9,6 @@ tags: ocr python
 * content
 {:toc}
 
-## Motivation
-
 I came across [this motion comic](https://www.youtube.com/watch?v=1LBFR90f6rg) (click [here](https://www.bilibili.com/video/av2786047) for the video if the link does not work) based on issue 16 of the IDW comic *The Transformers: More than Meets the Eye* (click [here](https://www.transformers.kiev.ua/index.php?pageid=idw) to view the comic in Russian or English and [here](http://www.tfg2.com/read.php?tid-45122.html) to view in Chinese). 
 
 In the motion comic, a video message is composed by putting together footage from various videos. I wanted to do the same with the image dimension, i.e., compose an image message by putting together various cropped images from the comics in a Montage-ish manner, as shown below. To read the message, just read off the speech bubbles in each image from left to right and top to down.
@@ -20,11 +18,11 @@ In the motion comic, a video message is composed by putting together footage fro
 <sup>Page 18-19 of The Transformers: More than Meets the Eye #16.</sup>
 </div>
 
+
+
 ## Preparation
 
 I read [this article](https://www.pyimagesearch.com/2017/07/10/using-tesseract-ocr-python/) about the OCR engine Tesseract and [this one](https://docs.opencv.org/3.3.0/d7/d4d/tutorial_py_thresholding.html) about OpenCV.
-
-
 
 ## Method
 

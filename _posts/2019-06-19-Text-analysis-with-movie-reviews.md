@@ -9,15 +9,13 @@ tags: text-analysis python nltk sentiment-analysis
 * content
 {:toc}
 
-## Motivation
-
 When [*Bumblebee*](https://www.imdb.com/title/tt4701182/) was released, I wanted to see what people would say about it and how its reception would compare with the other productions in the Transformers franchise.
+
+
 
 ## Preparation
 
 I read [this article](https://www.datacamp.com/community/tutorials/text-analytics-beginners-nltk) about NLTK and [this documentation](https://amueller.github.io/word_cloud/auto_examples/a_new_hope.html) about a module for word cloud.
-
-
 
 ## Method
 

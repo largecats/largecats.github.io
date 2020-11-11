@@ -18,9 +18,7 @@ tags: spark
 </head>
 * content
 {:toc}
-
-# Motivation   
-
+  
 Timeout errors may occur while the Spark application is running or even after the Spark application has finished. Below are some common timeout errors and their solutions.
 
 

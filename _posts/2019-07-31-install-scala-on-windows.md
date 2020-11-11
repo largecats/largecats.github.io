@@ -9,15 +9,13 @@ tags: scala
 * content
 {:toc}
 
-## Motivation
-
 I want to install Scala on my PC.
+
+
 
 ## Preparation
 
 I read [Scala's documentation](https://docs.scala-lang.org/).
-
-
 
 ## Method
 

@@ -9,8 +9,10 @@ tags: github-pages jekyll gitalk
 * content
 {:toc}
 
-## Motivation
+
 I wanted to set up a technical blog free of charge. A quick search on the world wide web shows that building technical blog using GitHub Pages seems to be a popular option. This post demonstrates how this blog site was built on Windows using GitHub Pages, Jekyll, and Gitalk.
+
+
 
 ## Preparation
 

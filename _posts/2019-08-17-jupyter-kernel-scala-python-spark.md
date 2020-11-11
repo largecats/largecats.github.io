@@ -9,14 +9,13 @@ tags: spark scala python
 * content
 {:toc}
 
-## Motivation
-
 I want to use spark via both python and scala with Jupyter notebook without having to import all those modules associated with pyspark. I'm using Windows.
+
+
 
 ## Preparation
 
 This post assumes configurations [here](https://largecats.github.io/2019/07/31/install-spark-on-windows/) and [here](https://largecats.github.io/2019/07/31/set-up-pyspark-with-jupyter-notebook/).
-
 
 
 ## Method

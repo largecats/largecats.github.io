@@ -19,8 +19,6 @@ tags: spark YARN shell-scripting
 * content
 {:toc}
 
-# Motivation   
-
 Spark has 2 deploy modes, client mode and cluster mode. Cluster mode is ideal for batch ETL jobs submitted via the same "driver server" because the driver programs are run on the cluster instead of the driver server, thereby preventing the driver server from becoming the resource bottleneck. But in cluster mode, the driver server is only responsible for running a client process that submits the application, after which the driver program would be run on a different machine in the cluster. This poses the following challenges:
 
 1. We can't access the driver program's log from the driver server (only the client process' log is available to the driver server).

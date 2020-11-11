@@ -9,7 +9,6 @@ tags: dos
 * content
 {:toc}
 
-## Problem
 I was updating my backup drive and needed to delete some huge folders on that drive. Deleting large folders in Windows explorer could take quite a while because Windows would first calculate the folder's size, which is time-consuming. Therefore, it would be great to know how to quickly delete huge folders on Windows.
 
 

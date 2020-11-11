@@ -9,15 +9,13 @@ tags: python
 * content
 {:toc}
 
-## Motivation
-
 I wanted to turn a list of addresses into coordinates and display them on a map widget.
+
+
 
 ## Preparation
 
 I read [Google Map's guide on API key](https://developers.google.com/maps/documentation/embed/get-api-key).
-
-
 
 ## Method
 First, create a Google Map API key following the above guide.
