@@ -41,9 +41,9 @@
                 .title {
                     font-weight: bold;
                     color: #223253;
-                    transition: 0.3s ease;
                     &:hover {
-                        color: #4d6dad;
+                        // color: #4d6dad;
+                        text-decoration: underline;
                     }
                 }
                 i {
@@ -59,9 +59,9 @@
                         background-color: #9e9d9d;
                         color: #fff;
                         font-size: 90%;
-                        transition: 0.3s ease;
                         &:hover {
-                            background-color: #b6b6b9;
+                            // background-color: #b6b6b9;
+                            text-decoration: underline;
                         }
                     }
                 }
@@ -77,9 +77,9 @@
                         border-radius: 4px;
                         color: #fff;
                         font-size: 90%;
-                        transition: 0.3s ease;
                         &:hover {
-                            background-color: #c0ddc7;
+                            // background-color: #c0ddc7;
+                            text-decoration: underline;
                         }
                     }
                 }
@@ -125,9 +125,8 @@
             }
             a {
                 color: #4d6dad;
-                transition: 0.5s ease;
                 &:hover {
-                    color: #223253;
+                    text-decoration: underline;
                 }
             }
         }
