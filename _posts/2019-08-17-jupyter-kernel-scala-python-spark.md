@@ -3,7 +3,7 @@ layout: post
 title:  "Setting up Jupyter Notebook kernel for Scala, Python to use Spark"
 date:   2019-08-17
 categories: life-saver work
-tags: spark scala python jupyter-notebook windows
+tags: spark scala python
 ---
 
 * content

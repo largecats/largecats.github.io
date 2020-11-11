@@ -3,7 +3,7 @@ layout: post
 title:  "OCR with comics"
 date:   2019-06-20
 categories: fun
-tags: ocr python tesseract
+tags: ocr python
 ---
 
 * content

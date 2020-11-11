@@ -3,7 +3,7 @@ layout: post
 title:  "Building blog with GitHub Pages, Jekyll, and Gitalk"
 date:   2019-06-17
 categories: blog
-tags: github-pages jekyll gitalk windows
+tags: github-pages jekyll gitalk
 ---
 
 * content

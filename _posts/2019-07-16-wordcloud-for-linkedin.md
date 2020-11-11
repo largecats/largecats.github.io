@@ -3,7 +3,7 @@ layout: post
 title:  "Generating wordcloud for LinkedIn background photo"
 date:   2019-07-16
 categories: fun
-tags: python wordcloud text-analysis
+tags: python text-analysis
 ---
 
 * content

@@ -3,7 +3,7 @@ layout: post
 title:  "Turning addresses into coordinates via Google Map API"
 date:   2019-07-30
 categories: fun
-tags: python google-map geolocator
+tags: python
 ---
 
 * content

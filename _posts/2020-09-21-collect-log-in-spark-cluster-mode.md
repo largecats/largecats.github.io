@@ -3,7 +3,7 @@ layout: post
 title:  "Collecting Log in Spark Cluster Mode"
 date:   2020-09-21
 categories: work
-tags: spark YARN Linux-shell
+tags: spark YARN shell-scripting
 ---
 <head>
     <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script>
