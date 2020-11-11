@@ -167,9 +167,9 @@ Execution plan of the second query shows that `t0` is stored in cache memory and
 <sup>Because t0 is cached, it is read from InMemoryTableScan, and the filter on region in t0 is not re-evaluated when computing t1 and t2.</sup>
 </div>
 
-### Caching may take more time than not caching
+### To cache or not to cache
 
-If the time it takes to compute a table * the times it is used > the time it takes to cache the table, then caching may save time. Otherwise, not caching would be faster.
+If the time it takes to compute a table * the times it is used > the time it takes to compute and cache the table, then caching may save time. Otherwise, not caching would be faster.
 
 In other words, if the query is simple but the dataframe is huge, it may be faster to not cache and just re-evaluate the dataframe as needed. If the query is complex and the resulting dataframe is small, then caching may improve performance if the dataframe needs to be reused.
 
@@ -185,7 +185,7 @@ In the above example, the query is simple but the underlying dataframe is quite 
 <sup>Start time, end time of t0 without cache.</sup>
 </div>
 
-### Caching eagerly can improve readability when tracking progress in YARN UI
+### Caching eagerly improves readability in YARN UI
 
 For Spark jobs that use complex SQL queries, the `SQL` page in YARN UI is a good way to track the progress of each query. However due to Spark's lazy evaluation, if the intermeidate tables are not cached eagerly or don't have any actions called upon them (e.g., `df.show()`), all the queries will be lumped together into one huge execution plan to be evaluated at the last step, e.g.:
 
@@ -195,7 +195,7 @@ For Spark jobs that use complex SQL queries, the `SQL` page in YARN UI is a good
 
 So if a dataframe needs to be cached at all, can consider caching eagerly using `spark.sql('cache table xxx')`, so that the query execution can be broken down into more trackable pieces. Moreover, when optimizing queries, it is recommended to cache each intermediate table eagerly, so as to make identifying bottlenecks easier.
 
-### Caching helps preventing stackoverflow in nested query plans
+### Caching prevents stackoverflow in nested query plans
 
 If the query plan structure is nested too deeply, Spark may throw `StackOverflowError` (see [here] (https://stackoverflow.com/questions/25147565/serializing-java-object-without-stackoverflowerror) and [here](https://stackoverflow.com/questions/37909444/spark-java-lang-stackoverflowerror)). This occurs when there are too many nested layers of column computation in intermediate tables, .e.g., 
 
